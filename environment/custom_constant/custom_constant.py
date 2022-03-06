@@ -37,6 +37,7 @@ login_y = 'login_y'
 webpath = 'webpath'
 autoStart = 'autoStart'
 autoClose = 'autoClose'
+guard_service = 'guard_service'
 
 
 # 字体

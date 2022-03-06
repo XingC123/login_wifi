@@ -104,7 +104,7 @@ class MainWindow:
         self.webpath_text.grid(row=0, column=1)
 
         # 立即登录
-        Button(self.main_frame, text="登录", command=self.login_wifi).grid(row=4, column=0)
+        Button(self.main_frame, text="登录", command=self.login_wifi_main).grid(row=4, column=0)
 
         # 自动执行
         auto_start_frame = Frame(self.main_frame)
@@ -126,6 +126,16 @@ class MainWindow:
                                                          onvalue=True, offvalue=False)
         self.auto_close_window_checkbutton.grid(row=0, column=0)
 
+        # 守护进程
+        guard_service_frame = Frame(self.main_frame)
+        guard_service_frame.grid(row=7, column=0)
+        self.guard_service_value_bool = BooleanVar()
+        self.guard_service_value_bool.set(False)
+        self.guard_service_checkbutton = Checkbutton(guard_service_frame, text='守护进程',
+                                                     variable=self.guard_service_value_bool,
+                                                     onvalue=True, offvalue=False)
+        self.guard_service_checkbutton.grid(row=0, column=0)
+
         # 保存配置
         def save_config():
             try:
@@ -136,10 +146,10 @@ class MainWindow:
             else:
                 custom_messagebox.CustomMessagebox(self.root_window, '保存配置', 300, 200, ['保存成功'])
 
-        Button(self.main_frame, text='保存到本地配置', command=save_config).grid(row=7, column=0)
+        Button(self.main_frame, text='保存到本地配置', command=save_config).grid(row=8, column=0)
 
         # 加载配置
-        Button(self.main_frame, text='加载本地配置', command=self.load_config).grid(row=7, column=1)
+        Button(self.main_frame, text='加载本地配置', command=self.load_config).grid(row=8, column=1)
 
         # 界面初始化
         self.init_root_window()
@@ -185,6 +195,12 @@ class MainWindow:
         self.root_window.resizable(False, False)
 
     def login_wifi(self):
+        self.login_wifi_main()
+
+        # 守护进程
+        self.guard_service()
+
+    def login_wifi_main(self):
         if not MainWindow.check_internet():
             webpath = self.webpath_text.get("0.0", END).lstrip()
             if webpath != '':
@@ -268,6 +284,8 @@ class MainWindow:
         autoClose = self.root_config.get_value(custom_constant.userconfig, custom_constant.autoClose).lstrip()
         # 网址
         webpath = self.root_config.get_value(custom_constant.userconfig, custom_constant.webpath).lstrip()
+        # 守护进程
+        guard_service = self.root_config.get_value(custom_constant.userconfig, custom_constant.guard_service).lstrip()
 
         if account != '' and account_x != '' and account_y != '' and \
                 password != '' and password_x != '' and password_y != '' and \
@@ -284,6 +302,7 @@ class MainWindow:
             MainWindow.set_value(self.auto_start_value_bool, autoStart)
             MainWindow.set_value(self.auto_close_window_value_bool, autoClose)
             MainWindow.set_value(self.webpath_text, webpath)
+            MainWindow.set_value(self.guard_service_value_bool, guard_service)
 
             if mode == 'boot':
                 if self.auto_start_value_bool.get():
@@ -328,8 +347,25 @@ class MainWindow:
             # 网址
             self.root_config.set_value(custom_constant.userconfig, custom_constant.webpath,
                                        webpath)
+            # 守护进程
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.guard_service,
+                                       self.guard_service_value_bool.get())
         else:
             raise ValueError("参数不全")
+
+    # 守护进程
+    def guard_service(self):
+        if self.guard_service_value_bool.get():
+            # 若启用守护进程
+            def guard_service():
+                while True:
+                    if not MainWindow.check_internet():
+                        self.login_wifi_main()
+                    time.sleep(5)
+
+            guard_service_thread = threading.Thread(target=guard_service)
+            guard_service_thread.daemon = True
+            guard_service_thread.start()
 
     @classmethod
     def check_internet(cls):

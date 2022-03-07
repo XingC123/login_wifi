@@ -28,6 +28,9 @@ class MainWindow:
         # 创建配置文件
         self.root_config = environment.config.main_config.MainConfig(work_path)
 
+        # 是否正在执行login任务
+        self.login_work_state = False
+
         # 主窗口
         self.root_window = Tk()
 
@@ -216,6 +219,8 @@ class MainWindow:
                         account_x != '' and account_y != '' and \
                         password_x != '' and password_y != '' and \
                         login_x != '' and login_y != '':
+                    # 标记login任务状态
+                    self.login_work_state = True
                     # 打开网址
                     webbrowser.open(webpath)
                     time.sleep(5)
@@ -247,6 +252,8 @@ class MainWindow:
                     # 自动关闭窗口
                     if self.auto_close_window_value_bool.get():
                         self.root_window.destroy()
+
+                    self.login_work_state = False
         else:
             custom_messagebox.CustomMessagebox(self.root_window, "连接wifi", 300, 200, ['已连接网络, 无需重复认证'])
 
@@ -355,7 +362,7 @@ class MainWindow:
 
     # 守护进程
     def guard_service(self):
-        if self.guard_service_value_bool.get():
+        if self.guard_service_value_bool.get() and not self.login_work_state:
             # 若启用守护进程
             def guard_service():
                 while True:

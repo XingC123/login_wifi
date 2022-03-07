@@ -362,11 +362,11 @@ class MainWindow:
 
     # 守护进程
     def guard_service(self):
-        if self.guard_service_value_bool.get() and not self.login_work_state:
+        if self.guard_service_value_bool.get():
             # 若启用守护进程
             def guard_service():
                 while True:
-                    if not MainWindow.check_internet():
+                    if not MainWindow.check_internet() and not self.login_work_state:
                         self.login_wifi_main()
                     time.sleep(5)
 

@@ -38,6 +38,7 @@ webpath = 'webpath'
 autoStart = 'autoStart'
 autoClose = 'autoClose'
 guard_service = 'guard_service'
+brower_name = 'brower_name'
 
 
 # 字体

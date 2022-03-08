@@ -5,24 +5,24 @@ from tkinter import *
 
 import pyautogui
 import pyperclip
-import requests
 
+import GUI.custom_messagebox as custom_messagebox
 # XingC
 # environment
 import environment
 import environment.config.main_config as main_config
-from environment.custom_constant import custom_constant
 # lib
 import lib.necessary_lib as necessary_lib
 import lib.stop_with_main_thread as stop_with_main_thread
+import lib.tools as venusTools
 # GUI
 from GUI import get_xy_window
-import GUI.custom_messagebox as custom_messagebox
+from environment.custom_constant import custom_constant
 
 
 class MainWindow:
     width_root_window = 600
-    height_root_window = 500
+    height_root_window = 600
 
     def __init__(self, work_path):
         # 创建配置文件
@@ -41,9 +41,18 @@ class MainWindow:
         self.main_frame.pack_propagate(False)
         self.main_frame.pack()
 
+        # 主frame的grid布局行号
+        now_row = 0
+
+        def currow():
+            # 返回当前已使用的最大行号+1
+            nonlocal now_row
+            now_row += 1
+            return now_row
+
         # 账号框
         account_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
-        account_frame.grid(row=0, column=0)
+        account_frame.grid(row=currow(), column=0)
         Label(account_frame, text="账号").grid(row=0, column=0)
         self.account_text = Text(account_frame, height=1, width=20)
         self.account_text.grid(row=0, column=1)
@@ -63,7 +72,7 @@ class MainWindow:
 
         # 密码框
         password_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
-        password_frame.grid(row=1, column=0)
+        password_frame.grid(row=currow(), column=0)
         Label(password_frame, text="密码").grid(row=0, column=0)
         self.password_text = Text(password_frame, height=1, width=20)
         self.password_text.grid(row=0, column=1)
@@ -83,7 +92,7 @@ class MainWindow:
 
         # 登录按钮坐标
         login_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
-        login_frame.grid(row=2, column=0)
+        login_frame.grid(row=currow(), column=0)
         Label(login_frame, text='登录按钮坐标').grid(row=0, column=0)
         # x坐标
         Label(login_frame, text='x坐标').grid(row=1, column=0)
@@ -101,17 +110,25 @@ class MainWindow:
 
         # 网址
         webpath_frame = Frame(self.main_frame)
-        webpath_frame.grid(row=3, column=0)
+        webpath_frame.grid(row=currow(), column=0)
         Label(webpath_frame, text="网址").grid(row=0, column=0)
         self.webpath_text = Text(webpath_frame, height=1, width=30)
         self.webpath_text.grid(row=0, column=1)
 
+        # 要打开的浏览器
+        brower_name_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
+        brower_name_frame.grid(row=currow(), column=0)
+        Label(brower_name_frame, text='登录所使用的浏览器的进程名').grid(row=0, column=0)
+        self.brower_name_text = Text(brower_name_frame, width=20, height=1)
+        self.brower_name_text.grid(row=0, column=1)
+        Label(brower_name_frame, text='注: 可在任务管理器运行浏览器并查看').grid(row=1, column=0)
+
         # 立即登录
-        Button(self.main_frame, text="登录", command=self.login_wifi_main).grid(row=4, column=0)
+        Button(self.main_frame, text="登录", command=self.login_wifi_main).grid(row=currow(), column=0)
 
         # 自动执行
         auto_start_frame = Frame(self.main_frame)
-        auto_start_frame.grid(row=5, column=0)
+        auto_start_frame.grid(row=currow(), column=0)
         self.auto_start_value_bool = BooleanVar()
         self.auto_start_value_bool.set(False)
         self.auto_start_checkbutton = Checkbutton(auto_start_frame, text="自动执行",
@@ -121,7 +138,7 @@ class MainWindow:
 
         # 自动关闭窗口
         auto_close_window_frame = Frame(self.main_frame)
-        auto_close_window_frame.grid(row=6, column=0)
+        auto_close_window_frame.grid(row=currow(), column=0)
         self.auto_close_window_value_bool = BooleanVar()
         self.auto_close_window_value_bool.set(False)
         self.auto_close_window_checkbutton = Checkbutton(auto_close_window_frame, text="自动关闭窗口",
@@ -131,15 +148,17 @@ class MainWindow:
 
         # 守护进程
         guard_service_frame = Frame(self.main_frame)
-        guard_service_frame.grid(row=7, column=0)
+        guard_service_frame.grid(row=currow(), column=0)
         self.guard_service_value_bool = BooleanVar()
         self.guard_service_value_bool.set(False)
         self.guard_service_checkbutton = Checkbutton(guard_service_frame, text='守护进程',
                                                      variable=self.guard_service_value_bool,
                                                      onvalue=True, offvalue=False)
         self.guard_service_checkbutton.grid(row=0, column=0)
-
         # 保存配置
+        config_button_frame = Frame(self.main_frame)
+        config_button_frame.grid(row=currow(), column=0)
+
         def save_config():
             try:
                 self.save_config()
@@ -149,10 +168,10 @@ class MainWindow:
             else:
                 custom_messagebox.CustomMessagebox(self.root_window, '保存配置', 300, 200, ['保存成功'])
 
-        Button(self.main_frame, text='保存到本地配置', command=save_config).grid(row=8, column=0)
-
+        Button(config_button_frame, text='保存到本地配置', command=save_config).grid(row=0, column=0)
         # 加载配置
-        Button(self.main_frame, text='加载本地配置', command=self.load_config).grid(row=8, column=1)
+        Button(config_button_frame, text='加载本地配置', command=self.load_config).grid(row=0, column=1)
+        Button(config_button_frame, text='强制加载本地配置', command=self.force_load_config).grid(row=0, column=2)
 
         # 界面初始化
         self.init_root_window()
@@ -204,26 +223,32 @@ class MainWindow:
         self.guard_service()
 
     def login_wifi_main(self):
-        if not MainWindow.check_internet():
-            webpath = self.webpath_text.get("0.0", END).lstrip()
+        if venusTools.check_internet():
+            webpath = self.webpath_text.get("0.0", END)
             if webpath != '':
-                account = self.account_text.get("0.0", END).lstrip()
-                password = self.password_text.get("0.0", END).lstrip()
-                account_x = self.account_x_text.get(0.0, END).lstrip()
-                account_y = self.account_y_text.get(0.0, END).lstrip()
-                password_x = self.password_x_text.get(0.0, END).lstrip()
-                password_y = self.password_y_text.get(0.0, END).lstrip()
-                login_x = self.login_x_text.get(0.0, END).lstrip()
-                login_y = self.login_y_text.get(0.0, END).lstrip()
+                account = self.account_text.get("0.0", END)
+                password = self.password_text.get("0.0", END)
+                account_x = self.account_x_text.get(0.0, END)
+                account_y = self.account_y_text.get(0.0, END)
+                password_x = self.password_x_text.get(0.0, END)
+                password_y = self.password_y_text.get(0.0, END)
+                login_x = self.login_x_text.get(0.0, END)
+                login_y = self.login_y_text.get(0.0, END)
+                brower_name = self.brower_name_text.get(0.0, END)[::-1].replace('\r', '').replace('\n', '')[::-1]
                 if account != '' and password != '' and \
                         account_x != '' and account_y != '' and \
                         password_x != '' and password_y != '' and \
-                        login_x != '' and login_y != '':
+                        login_x != '' and login_y != '' and \
+                        brower_name != '':
                     # 标记login任务状态
                     self.login_work_state = True
                     # 打开网址
                     webbrowser.open(webpath)
-                    time.sleep(5)
+                    while True:
+                        if venusTools.proc_exist(brower_name):
+                            time.sleep(10)
+                            break
+                        time.sleep(5)
 
                     # 输入账号
                     pyautogui.click(int(account_x), int(account_y))
@@ -271,45 +296,56 @@ class MainWindow:
                 # 如果不需要自动登录, 则显示加载结果
                 custom_messagebox.CustomMessagebox(self.root_window, '加载配置', 300, 200, ['加载成功'])
 
+    def force_load_config(self):
+        self.load_config('force')
+
     def load_config_main(self, mode):
         # 加载本地配置
         self.root_config.read_config()
         # 账号
-        account = self.root_config.get_value(custom_constant.userconfig, custom_constant.account).lstrip()
-        account_x = self.root_config.get_value(custom_constant.userconfig, custom_constant.account_x).lstrip()
-        account_y = self.root_config.get_value(custom_constant.userconfig, custom_constant.account_y).lstrip()
+        account = self.root_config.get_value(custom_constant.userconfig, custom_constant.account)
+        account_x = self.root_config.get_value(custom_constant.userconfig, custom_constant.account_x)
+        account_y = self.root_config.get_value(custom_constant.userconfig, custom_constant.account_y)
         # 密码
-        password = self.root_config.get_value(custom_constant.userconfig, custom_constant.password).lstrip()
-        password_x = self.root_config.get_value(custom_constant.userconfig, custom_constant.password_x).lstrip()
-        password_y = self.root_config.get_value(custom_constant.userconfig, custom_constant.password_y).lstrip()
+        password = self.root_config.get_value(custom_constant.userconfig, custom_constant.password)
+        password_x = self.root_config.get_value(custom_constant.userconfig, custom_constant.password_x)
+        password_y = self.root_config.get_value(custom_constant.userconfig, custom_constant.password_y)
         # 登录按钮
-        login_x = self.root_config.get_value(custom_constant.userconfig, custom_constant.login_x).lstrip()
-        login_y = self.root_config.get_value(custom_constant.userconfig, custom_constant.login_y).lstrip()
+        login_x = self.root_config.get_value(custom_constant.userconfig, custom_constant.login_x)
+        login_y = self.root_config.get_value(custom_constant.userconfig, custom_constant.login_y)
         # 自动执行
-        autoStart = self.root_config.get_value(custom_constant.userconfig, custom_constant.autoStart).lstrip()
+        autoStart = self.root_config.get_value(custom_constant.userconfig, custom_constant.autoStart)
         # 自动关闭
-        autoClose = self.root_config.get_value(custom_constant.userconfig, custom_constant.autoClose).lstrip()
+        autoClose = self.root_config.get_value(custom_constant.userconfig, custom_constant.autoClose)
         # 网址
-        webpath = self.root_config.get_value(custom_constant.userconfig, custom_constant.webpath).lstrip()
+        webpath = self.root_config.get_value(custom_constant.userconfig, custom_constant.webpath)
         # 守护进程
-        guard_service = self.root_config.get_value(custom_constant.userconfig, custom_constant.guard_service).lstrip()
+        guard_service = self.root_config.get_value(custom_constant.userconfig, custom_constant.guard_service)
+        # 登录所使用的浏览器进程名
+        brower_name = self.root_config.get_value(custom_constant.userconfig, custom_constant.brower_name)
 
-        if account != '' and account_x != '' and account_y != '' and \
+        if mode == 'force' or account != '' and account_x != '' and account_y != '' and \
                 password != '' and password_x != '' and password_y != '' and \
                 login_x != '' and login_y != '' and \
-                webpath != '':
-            MainWindow.set_value(self.account_text, account)
-            MainWindow.set_value(self.account_x_text, account_x)
-            MainWindow.set_value(self.account_y_text, account_y)
-            MainWindow.set_value(self.password_text, password)
-            MainWindow.set_value(self.password_x_text, password_x)
-            MainWindow.set_value(self.password_y_text, password_y)
-            MainWindow.set_value(self.login_x_text, login_x)
-            MainWindow.set_value(self.login_y_text, login_y)
-            MainWindow.set_value(self.auto_start_value_bool, autoStart)
-            MainWindow.set_value(self.auto_close_window_value_bool, autoClose)
-            MainWindow.set_value(self.webpath_text, webpath)
-            MainWindow.set_value(self.guard_service_value_bool, guard_service)
+                webpath != '' and \
+                brower_name != '':
+            try:
+                MainWindow.set_value(self.account_text, account)
+                MainWindow.set_value(self.account_x_text, account_x)
+                MainWindow.set_value(self.account_y_text, account_y)
+                MainWindow.set_value(self.password_text, password)
+                MainWindow.set_value(self.password_x_text, password_x)
+                MainWindow.set_value(self.password_y_text, password_y)
+                MainWindow.set_value(self.login_x_text, login_x)
+                MainWindow.set_value(self.login_y_text, login_y)
+                MainWindow.set_value(self.auto_start_value_bool, autoStart)
+                MainWindow.set_value(self.auto_close_window_value_bool, autoClose)
+                MainWindow.set_value(self.webpath_text, webpath)
+                MainWindow.set_value(self.guard_service_value_bool, guard_service)
+                MainWindow.set_value(self.brower_name_text, brower_name)
+            except Exception as e:
+                print('ERROR: 强制加载配置: ', end=', ')
+                print(e)
 
             if mode == 'boot':
                 if self.auto_start_value_bool.get():
@@ -320,20 +356,22 @@ class MainWindow:
 
     def save_config(self):
         # 保存配置
-        account = self.account_text.get(0.0, END).lstrip()
-        account_x = self.account_x_text.get(0.0, END).lstrip()
-        account_y = self.account_y_text.get(0.0, END).lstrip()
-        password = self.password_text.get(0.0, END).lstrip()
-        password_x = self.password_x_text.get(0.0, END).lstrip()
-        password_y = self.password_y_text.get(0.0, END).lstrip()
-        login_x = self.login_x_text.get(0.0, END).lstrip()
-        login_y = self.login_y_text.get(0.0, END).lstrip()
-        webpath = self.webpath_text.get(0.0, END).lstrip()
+        account = self.account_text.get(0.0, END)
+        account_x = self.account_x_text.get(0.0, END)
+        account_y = self.account_y_text.get(0.0, END)
+        password = self.password_text.get(0.0, END)
+        password_x = self.password_x_text.get(0.0, END)
+        password_y = self.password_y_text.get(0.0, END)
+        login_x = self.login_x_text.get(0.0, END)
+        login_y = self.login_y_text.get(0.0, END)
+        webpath = self.webpath_text.get(0.0, END)
+        brower_name = self.brower_name_text.get(0.0, END)
 
         if account != '' and account_x != '' and account_y != '' and \
                 password != '' and password_x != '' and password_y != '' and \
                 login_x != '' and login_y != '' and \
-                webpath != '':
+                webpath != '' and \
+                brower_name != '':
             # 账号
             self.root_config.set_value(custom_constant.userconfig, custom_constant.account, account)
             self.root_config.set_value(custom_constant.userconfig, custom_constant.account_x, account_x)
@@ -357,6 +395,9 @@ class MainWindow:
             # 守护进程
             self.root_config.set_value(custom_constant.userconfig, custom_constant.guard_service,
                                        self.guard_service_value_bool.get())
+            # 登录所使用的浏览器的名称
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.brower_name,
+                                       brower_name)
         else:
             raise ValueError("参数不全")
 
@@ -366,31 +407,13 @@ class MainWindow:
             # 若启用守护进程
             def guard_service():
                 while True:
-                    if not MainWindow.check_internet() and not self.login_work_state:
+                    if not venusTools.check_internet() and not self.login_work_state:
                         self.login_wifi_main()
                     time.sleep(5)
 
             guard_service_thread = threading.Thread(target=guard_service)
             guard_service_thread.daemon = True
             guard_service_thread.start()
-
-    @classmethod
-    def check_internet(cls):
-        # 网络检测
-        # url = "http://www.baidu.com"
-        # try:
-        #     status = urllib.urlopen(url).code
-        #     print(status)
-        # except:
-        #     print({'result': 'false', 'msg': 'URL cannot access'})
-        try:
-            html = requests.get("https://www.baidu.com", timeout=2)
-        except:
-            print('无网络')
-            return False
-        else:
-            print('有网络')
-            return True
 
     @classmethod
     def set_value(cls, element, content):

@@ -39,6 +39,13 @@ autoStart = 'autoStart'
 autoClose = 'autoClose'
 guard_service = 'guard_service'
 brower_name = 'brower_name'
+work_mode = 'work_mode'
+webdriver_type = 'webdriver_type'
+webdriver_path = 'webdriver_path'
+account_id = 'account_id'
+pwd_id = 'pwd_id'
+login_id = 'login_id'
+button_click_mode = 'button_click_mode'
 
 
 # 字体

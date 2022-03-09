@@ -1,12 +1,13 @@
 import threading
 import time
+import tkinter.filedialog
 import webbrowser
 from tkinter import *
+from tkinter import ttk
 
 import pyautogui
 import pyperclip
 
-import GUI.custom_messagebox as custom_messagebox
 # XingC
 # environment
 import environment
@@ -15,14 +16,18 @@ import environment.config.main_config as main_config
 import lib.necessary_lib as necessary_lib
 import lib.stop_with_main_thread as stop_with_main_thread
 import lib.tools as venusTools
+from lib.custom_config_object import AlphaLoginObject
 # GUI
 from GUI import get_xy_window
 from environment.custom_constant import custom_constant
+import GUI.custom_messagebox as custom_messagebox
+# func
+from func.login_webdriver import LoginGiwifi
 
 
 class MainWindow:
     width_root_window = 600
-    height_root_window = 600
+    height_root_window = 900
 
     def __init__(self, work_path):
         # 创建配置文件
@@ -50,10 +55,28 @@ class MainWindow:
             now_row += 1
             return now_row
 
+        # 运行模式
+        work_mode_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
+        work_mode_frame.grid(row=currow(), column=0)
+        self.work_mode_value_int = IntVar()
+        self.work_mode_value_int.set(1)
+        Label(work_mode_frame, text='运行模式').grid(row=0, column=0, columnspan=2)
+        self.work_mode_stable_checkbutton = Checkbutton(work_mode_frame, text='稳定模式',
+                                                        variable=self.work_mode_value_int,
+                                                        onvalue=1,
+                                                        command=self.load_element_by_mode)
+        self.work_mode_stable_checkbutton.grid(row=1, column=0)
+        self.work_mode_ALPHA_checkbutton = Checkbutton(work_mode_frame, text='ALPHA模式',
+                                                       variable=self.work_mode_value_int,
+                                                       onvalue=2,
+                                                       command=self.load_element_by_mode)
+        self.work_mode_ALPHA_checkbutton.grid(row=1, column=1)
+        Label(work_mode_frame, text='注: 带 * 项目为 [ALPHA模式] 必须参数').grid(row=2, column=0, columnspan=2)
+
         # 账号框
         account_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
         account_frame.grid(row=currow(), column=0)
-        Label(account_frame, text="账号").grid(row=0, column=0)
+        Label(account_frame, text="* 账号").grid(row=0, column=0)
         self.account_text = Text(account_frame, height=1, width=20)
         self.account_text.grid(row=0, column=1)
         # x坐标
@@ -68,12 +91,12 @@ class MainWindow:
         def get_account_xy():
             self.get_xy(self.account_x_text, self.account_y_text)
 
-        Button(account_frame, text='采集坐标', command=get_account_xy).grid(row=2, column=0)
+        Button(account_frame, text='采集坐标', command=get_account_xy).grid(row=2, column=0, columnspan=4)
 
         # 密码框
         password_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
         password_frame.grid(row=currow(), column=0)
-        Label(password_frame, text="密码").grid(row=0, column=0)
+        Label(password_frame, text="* 密码").grid(row=0, column=0)
         self.password_text = Text(password_frame, height=1, width=20)
         self.password_text.grid(row=0, column=1)
         # x坐标
@@ -88,12 +111,12 @@ class MainWindow:
         def get_password_xy():
             self.get_xy(self.password_x_text, self.password_y_text)
 
-        Button(password_frame, text='采集坐标', command=get_password_xy).grid(row=2, column=0)
+        Button(password_frame, text='采集坐标', command=get_password_xy).grid(row=2, column=0, columnspan=4)
 
         # 登录按钮坐标
         login_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
         login_frame.grid(row=currow(), column=0)
-        Label(login_frame, text='登录按钮坐标').grid(row=0, column=0)
+        Label(login_frame, text='登录按钮坐标').grid(row=0, column=0, columnspan=4)
         # x坐标
         Label(login_frame, text='x坐标').grid(row=1, column=0)
         self.login_x_text = Text(login_frame, height=1, width=6)
@@ -106,12 +129,12 @@ class MainWindow:
         def get_login_xy():
             self.get_xy(self.login_x_text, self.login_y_text)
 
-        Button(login_frame, text='采集坐标', command=get_login_xy).grid(row=2, column=0)
+        Button(login_frame, text='采集坐标', command=get_login_xy).grid(row=2, column=0, columnspan=4)
 
         # 网址
         webpath_frame = Frame(self.main_frame)
         webpath_frame.grid(row=currow(), column=0)
-        Label(webpath_frame, text="网址").grid(row=0, column=0)
+        Label(webpath_frame, text="* 网址").grid(row=0, column=0)
         self.webpath_text = Text(webpath_frame, height=1, width=30)
         self.webpath_text.grid(row=0, column=1)
 
@@ -121,7 +144,49 @@ class MainWindow:
         Label(brower_name_frame, text='登录所使用的浏览器的进程名').grid(row=0, column=0)
         self.brower_name_text = Text(brower_name_frame, width=20, height=1)
         self.brower_name_text.grid(row=0, column=1)
-        Label(brower_name_frame, text='注: 可在任务管理器运行浏览器并查看').grid(row=1, column=0)
+        Label(brower_name_frame, text='注: 可在任务管理器运行浏览器并查看').grid(row=1, column=0, columnspan=2)
+
+        # 浏览器驱动
+        webdriver_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
+        webdriver_frame.grid(row=currow(), column=0)
+        Label(webdriver_frame, text='* 默认浏览器类型').grid(row=0, column=0)
+        self.webdriver_type_value_str = StringVar()
+        self.webdriver_type_value_str.set('Microsoft edge Chromium')
+        webdriver_type_list = ['Microsoft edge Chromium', 'Chrome', 'Firefox']
+        self.webdriver_type_combobox = ttk.Combobox(webdriver_frame, height=3, width=25, state='readonly',
+                                                    textvariable=self.webdriver_type_value_str,
+                                                    values=webdriver_type_list)
+        self.webdriver_type_combobox.grid(row=0, column=1)
+        Label(webdriver_frame, text='* 浏览器驱动地址').grid(row=1, column=0)
+        self.webdriver_path_text = Text(webdriver_frame, height=3, width=30)
+        self.webdriver_path_text.grid(row=1, column=1)
+
+        def choose_file():
+            MainWindow.choose_file(self.webdriver_path_text)
+
+        Button(webdriver_frame, text='打开', command=choose_file).grid(row=1, column=2)
+        Label(webdriver_frame, text='注: 以下id请自行从html源代码查找').grid(row=2, column=0, columnspan=4)
+        Label(webdriver_frame, text='* 账号框id').grid(row=3, column=0)
+        self.account_id_text = Text(webdriver_frame, height=1, width=30)
+        self.account_id_text.grid(row=3, column=1)
+        Label(webdriver_frame, text='* 密码框id').grid(row=4, column=0)
+        self.password_id_text = Text(webdriver_frame, height=1, width=30)
+        self.password_id_text.grid(row=4, column=1)
+        Label(webdriver_frame, text='* 登录框id').grid(row=5, column=0)
+        self.login_id_text = Text(webdriver_frame, height=1, width=30)
+        self.login_id_text.grid(row=5, column=1)
+        Label(webdriver_frame, text='* 登录按钮点击方式').grid(row=6, column=0)
+        self.login_id_click_mode_value_str = StringVar()
+        self.login_id_click_mode_value_str.set('click')
+        self.login_id_click_mode_checkbutton_click = Checkbutton(webdriver_frame, text='方式一',
+                                                                 variable=self.login_id_click_mode_value_str,
+                                                                 onvalue='click')
+        self.login_id_click_mode_checkbutton_click.grid(row=6, column=1)
+        self.login_id_click_mode_checkbutton_submit = Checkbutton(webdriver_frame, text='方式二',
+                                                                  variable=self.login_id_click_mode_value_str,
+                                                                  onvalue='submit')
+        self.login_id_click_mode_checkbutton_submit.grid(row=7, column=1)
+        Label(webdriver_frame, text='注: 若选择 [运行模式] 为 [ALPHA模式], 则此为必须参数', width=50).grid(row=8, column=0, columnspan=2)
 
         # 立即登录
         Button(self.main_frame, text="登录", command=self.login_wifi_main).grid(row=currow(), column=0)
@@ -174,7 +239,7 @@ class MainWindow:
         Button(config_button_frame, text='强制加载本地配置', command=self.force_load_config).grid(row=0, column=2)
 
         # 界面初始化
-        self.init_root_window()
+        self.init_all_elements_in_window()
 
         # 配置初始化
         def init_config():
@@ -216,6 +281,39 @@ class MainWindow:
                                                               MainWindow.height_root_window))
         self.root_window.resizable(False, False)
 
+    def init_all_elements_in_window(self):
+        # 初始化主窗口
+        self.init_root_window()
+        # 初始化其他部件
+        self.load_element_by_mode()
+
+    def load_element_by_mode(self):
+        work_mode = self.work_mode_value_int.get()
+        if work_mode == 1:
+            # 账号
+            self.account_x_text['state'] = NORMAL
+            self.account_y_text['state'] = NORMAL
+            # 密码
+            self.password_x_text['state'] = NORMAL
+            self.password_y_text['state'] = NORMAL
+            # 登录按钮
+            self.login_x_text['state'] = NORMAL
+            self.login_y_text['state'] = NORMAL
+            # 登录所使用的浏览器名称
+            self.brower_name_text['state'] = NORMAL
+        elif work_mode == 2:
+            # 账号
+            self.account_x_text['state'] = DISABLED
+            self.account_y_text['state'] = DISABLED
+            # 密码
+            self.password_x_text['state'] = DISABLED
+            self.password_y_text['state'] = DISABLED
+            # 登录按钮
+            self.login_x_text['state'] = DISABLED
+            self.login_y_text['state'] = DISABLED
+            # 登录所使用的浏览器名称
+            self.brower_name_text['state'] = DISABLED
+
     def login_wifi(self):
         self.login_wifi_main()
 
@@ -223,7 +321,7 @@ class MainWindow:
         self.guard_service()
 
     def login_wifi_main(self):
-        if venusTools.check_internet():
+        if not venusTools.check_internet():
             webpath = self.webpath_text.get("0.0", END)
             if webpath != '':
                 account = self.account_text.get("0.0", END)
@@ -235,44 +333,61 @@ class MainWindow:
                 login_x = self.login_x_text.get(0.0, END)
                 login_y = self.login_y_text.get(0.0, END)
                 brower_name = self.brower_name_text.get(0.0, END)[::-1].replace('\r', '').replace('\n', '')[::-1]
-                if account != '' and password != '' and \
+                work_mode = self.work_mode_value_int.get()
+                # ALPHA模式
+                webdriver_path = self.webdriver_path_text.get(0.0, END)
+                webdriver_type = self.webdriver_type_combobox.get()
+                account_id = self.account_id_text.get(0.0, END)
+                password_id = self.password_id_text.get(0.0, END)
+                login_id = self.login_id_text.get(0.0, END)
+
+                if work_mode == 1 and account != '' and password != '' and \
                         account_x != '' and account_y != '' and \
                         password_x != '' and password_y != '' and \
                         login_x != '' and login_y != '' and \
-                        brower_name != '':
+                        brower_name != '' or \
+                        work_mode == 2 and webdriver_path != '' and webdriver_type != '' and \
+                        account_id != '' and password_id != '' and login_id != '':
                     # 标记login任务状态
                     self.login_work_state = True
-                    # 打开网址
-                    webbrowser.open(webpath)
-                    while True:
-                        if venusTools.proc_exist(brower_name):
-                            time.sleep(10)
-                            break
+                    if work_mode == 1:
+                        # 打开网址
+                        webbrowser.open(webpath)
+                        while True:
+                            if venusTools.proc_exist(brower_name):
+                                time.sleep(10)
+                                break
+                            time.sleep(5)
+
+                        # 输入账号
+                        pyautogui.click(int(account_x), int(account_y))
+                        pyperclip.copy(account)
+                        time.sleep(5)
+                        pyautogui.hotkey('ctrl', 'v')
                         time.sleep(5)
 
-                    # 输入账号
-                    pyautogui.click(int(account_x), int(account_y))
-                    pyperclip.copy(account)
-                    time.sleep(5)
-                    pyautogui.hotkey('ctrl', 'v')
-                    time.sleep(5)
+                        # 点击其他地方
+                        pyautogui.click(10, 400)
+                        time.sleep(2)
 
-                    # 点击其他地方
-                    pyautogui.click(10, 400)
-                    time.sleep(2)
+                        # 输入密码
+                        pyautogui.click(int(password_x), int(password_y))
+                        pyperclip.copy(password)
+                        time.sleep(5)
+                        pyautogui.hotkey('ctrl', 'v')
+                        time.sleep(5)
 
-                    # 输入密码
-                    pyautogui.click(int(password_x), int(password_y))
-                    pyperclip.copy(password)
-                    time.sleep(5)
-                    pyautogui.hotkey('ctrl', 'v')
-                    time.sleep(5)
+                        # 点击登录
+                        pyautogui.click(int(login_x), int(login_y))
 
-                    # 点击登录
-                    pyautogui.click(int(login_x), int(login_y))
-
-                    #
-                    pyperclip.copy('自动登录')
+                        #
+                        pyperclip.copy('自动登录')
+                    elif work_mode == 2:
+                        # LoginGiwifi(self.webdriver_path_text, webpath, account, password).run()
+                        LoginGiwifi(AlphaLoginObject(account, password, webpath,
+                                                     self.webdriver_path_text.get(0.0, END),
+                                                     account_id, password_id, login_id,
+                                                     self.login_id_click_mode_value_str.get())).run()
 
                     # 自动关闭窗口
                     if self.auto_close_window_value_bool.get():
@@ -323,12 +438,24 @@ class MainWindow:
         guard_service = self.root_config.get_value(custom_constant.userconfig, custom_constant.guard_service)
         # 登录所使用的浏览器进程名
         brower_name = self.root_config.get_value(custom_constant.userconfig, custom_constant.brower_name)
+        # 工作模式
+        work_mode = venusTools.str2int(self.root_config.get_value(custom_constant.userconfig,
+                                                                  custom_constant.work_mode))
+        # ALPHA
+        webdriver_type = self.root_config.get_value(custom_constant.userconfig, custom_constant.webdriver_type)
+        webdriver_path = self.root_config.get_value(custom_constant.userconfig, custom_constant.webdriver_path)
+        account_id = self.root_config.get_value(custom_constant.userconfig, custom_constant.account_id)
+        password_id = self.root_config.get_value(custom_constant.userconfig, custom_constant.pwd_id)
+        login_id = self.root_config.get_value(custom_constant.userconfig, custom_constant.login_id)
+        button_click_mode = self.root_config.get_value(custom_constant.userconfig, custom_constant.button_click_mode)
 
-        if mode == 'force' or account != '' and account_x != '' and account_y != '' and \
+        if mode == 'force' or work_mode == 1 and account != '' and account_x != '' and account_y != '' and \
                 password != '' and password_x != '' and password_y != '' and \
                 login_x != '' and login_y != '' and \
                 webpath != '' and \
-                brower_name != '':
+                brower_name != '' or \
+                work_mode == 2 and webdriver_path != '' and webdriver_type != '' and \
+                account_id != '' and password_id != '' and login_id != '':
             try:
                 MainWindow.set_value(self.account_text, account)
                 MainWindow.set_value(self.account_x_text, account_x)
@@ -343,6 +470,13 @@ class MainWindow:
                 MainWindow.set_value(self.webpath_text, webpath)
                 MainWindow.set_value(self.guard_service_value_bool, guard_service)
                 MainWindow.set_value(self.brower_name_text, brower_name)
+                MainWindow.set_value(self.work_mode_value_int, work_mode)
+                MainWindow.set_value(self.webdriver_type_value_str, webdriver_type)
+                MainWindow.set_value(self.webdriver_path_text, webdriver_path)
+                MainWindow.set_value(self.account_id_text, account_id)
+                MainWindow.set_value(self.password_id_text, password_id)
+                MainWindow.set_value(self.login_id_text, login_id)
+                MainWindow.set_value(self.login_id_click_mode_value_str, button_click_mode)
             except Exception as e:
                 print('ERROR: 强制加载配置: ', end=', ')
                 print(e)
@@ -366,12 +500,21 @@ class MainWindow:
         login_y = self.login_y_text.get(0.0, END)
         webpath = self.webpath_text.get(0.0, END)
         brower_name = self.brower_name_text.get(0.0, END)
+        work_mode = self.work_mode_value_int.get()
+        # ALPHA模式
+        webdriver_path = self.webdriver_path_text.get(0.0, END)
+        webdriver_type = self.webdriver_type_combobox.get()
+        account_id = self.account_id_text.get(0.0, END)
+        password_id = self.password_id_text.get(0.0, END)
+        login_id = self.login_id_text.get(0.0, END)
 
-        if account != '' and account_x != '' and account_y != '' and \
+        if work_mode == 1 and account != '' and account_x != '' and account_y != '' and \
                 password != '' and password_x != '' and password_y != '' and \
                 login_x != '' and login_y != '' and \
                 webpath != '' and \
-                brower_name != '':
+                brower_name != '' or \
+                work_mode == 2 and webdriver_path != '' and webdriver_type != '' and \
+                account_id != '' and password_id != '' and login_id != '':
             # 账号
             self.root_config.set_value(custom_constant.userconfig, custom_constant.account, account)
             self.root_config.set_value(custom_constant.userconfig, custom_constant.account_x, account_x)
@@ -398,6 +541,22 @@ class MainWindow:
             # 登录所使用的浏览器的名称
             self.root_config.set_value(custom_constant.userconfig, custom_constant.brower_name,
                                        brower_name)
+            # 运行模式
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.work_mode,
+                                       work_mode)
+            # ALPHA模式
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.webdriver_type,
+                                       webdriver_type)
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.webdriver_path,
+                                       webdriver_path)
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.account_id,
+                                       account_id)
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.pwd_id,
+                                       password_id)
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.login_id,
+                                       login_id)
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.button_click_mode,
+                                       self.login_id_click_mode_value_str.get())
         else:
             raise ValueError("参数不全")
 
@@ -414,6 +573,13 @@ class MainWindow:
             guard_service_thread = threading.Thread(target=guard_service)
             guard_service_thread.daemon = True
             guard_service_thread.start()
+
+    @classmethod
+    def choose_file(cls, element):
+        # 选择本地文件
+        path = tkinter.filedialog.askopenfilename()
+        if path is not None and path != '':
+            MainWindow.set_value(element, path)
 
     @classmethod
     def set_value(cls, element, content):

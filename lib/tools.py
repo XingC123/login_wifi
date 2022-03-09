@@ -30,6 +30,13 @@ def check_internet():
         return True
 
 
+def str2int(string):
+    if string != '':
+        return int(string)
+    else:
+        return -1
+
+
 if __name__ == '__main__':
     if proc_exist('qq.exe'):
         print('在运行')

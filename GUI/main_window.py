@@ -356,9 +356,10 @@ class MainWindow:
                     self.webdriver_type_combobox.get(), self.webdriver_path_text.get(0.0, END)[:-1],
                     self.account_id_text.get(0.0, END)[:-1], self.password_id_text.get(0.0, END)[:-1],
                     self.login_id_text.get(0.0, END)[:-1], self.login_id_click_mode_value_str.get(),
-                    self.auto_close_window_value_bool.get(), self.auto_close_window_value_bool.get(),
+                    self.auto_start_value_bool.get(), self.auto_close_window_value_bool.get(),
                     self.guard_service_value_bool.get()
                 )
+                print(self.alpha_object.alpha_object[custom_constant.func_object])
         except:
             raise ValueError('generate_object(self): 生成对象失败')
 
@@ -445,7 +446,7 @@ class MainWindow:
         # 工作模式
         work_mode = venusTools.str2int(self.root_config.get_value(custom_constant.userconfig,
                                                                   custom_constant.work_mode))
-        print('workmode = [', work_mode, ']')
+        print('load_config_main(self, mode): workmode = [', work_mode, ']')
         if work_mode in self.all_work_mode:
             if work_mode == 1:
                 self.normal_object = NormalLoginObject()
@@ -557,24 +558,25 @@ class MainWindow:
     def save_config(self):
         # 保存配置
         work_mode = self.get_cur_work_mode()
-        if work_mode == 1:
-            self.generate_object(work_mode)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.work_mode, work_mode)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.normal_object,
-                                       self.normal_object.normal_object)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.func_object,
-                                       self.normal_object.func_object.func_object)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.alpha_object, '')
-        elif work_mode == 2:
-            self.generate_object(work_mode)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.work_mode, work_mode)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.alpha_object,
-                                       self.alpha_object.alpha_object)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.func_object,
-                                       self.alpha_object.func_object.func_object)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.normal_object, '')
-        else:
-            raise ValueError("save_config(self): 参数不全")
+        if work_mode in self.all_work_mode:
+            if work_mode == 1:
+                self.generate_object(work_mode)
+                self.root_config.set_value(custom_constant.userconfig, custom_constant.work_mode, work_mode)
+                self.root_config.set_value(custom_constant.userconfig, custom_constant.normal_object,
+                                           self.normal_object.normal_object)
+                self.root_config.set_value(custom_constant.userconfig, custom_constant.func_object,
+                                           self.normal_object.func_object.func_object)
+                self.root_config.set_value(custom_constant.userconfig, custom_constant.alpha_object, '')
+            elif work_mode == 2:
+                self.generate_object(work_mode)
+                self.root_config.set_value(custom_constant.userconfig, custom_constant.work_mode, work_mode)
+                self.root_config.set_value(custom_constant.userconfig, custom_constant.alpha_object,
+                                           self.alpha_object.alpha_object)
+                self.root_config.set_value(custom_constant.userconfig, custom_constant.func_object,
+                                           self.alpha_object.func_object.func_object)
+                self.root_config.set_value(custom_constant.userconfig, custom_constant.normal_object, '')
+            else:
+                raise ValueError("save_config(self): 参数不全")
 
     # 守护进程
     def guard_service(self):

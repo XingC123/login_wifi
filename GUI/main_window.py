@@ -376,7 +376,7 @@ class MainWindow:
                 if self.normal_object is None:
                     self.generate_object(self.get_cur_work_mode())
                 # 打开网址
-                webbrowser.open(self.normal_object.normal_object[custom_constant.webpath])
+                webbrowser.open(self.normal_object.normal_object[custom_constant.func_object][custom_constant.webpath])
                 while True:
                     if venusTools.proc_exist(self.normal_object.normal_object[custom_constant.brower_name]):
                         time.sleep(10)
@@ -412,7 +412,7 @@ class MainWindow:
             elif self.get_cur_work_mode() == 2:
                 if self.alpha_object is None:
                     self.generate_object(self.get_cur_work_mode())
-                Login(self.alpha_object)
+                Login(self.alpha_object.alpha_object).run()
 
             # 自动关闭窗口
             if self.auto_close_window_value_bool.get():

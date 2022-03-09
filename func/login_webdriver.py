@@ -1,3 +1,5 @@
+import time
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
@@ -13,7 +15,7 @@ class Login:
         # 驱动路径
         self.driver_path = self.Alpha_object[custom_constant.webdriver_path]
         # 网址
-        self.url = self.Alpha_object[custom_constant.webpath]
+        self.url = self.Alpha_object[custom_constant.func_object][custom_constant.webpath]
         # 账号 & 密码
         self.account_str = self.Alpha_object[custom_constant.account]
         self.password_str = self.Alpha_object[custom_constant.password]
@@ -26,7 +28,7 @@ class Login:
         # hook的giwifi元素数组
         self.element_list = [self.account_id, self.pwd_id, self.login_id]
         # 按钮点击方式
-        self._button_click_mode = self.Alpha_object[custom_constant.button_click_mode]
+        self.button_click_mode = self.Alpha_object[custom_constant.button_click_mode]
 
         # 初始化
         self.init_webdriver(self.driver_path)
@@ -69,7 +71,7 @@ class Login:
                 element.send_keys(self.password_str)
             elif element_type == 'button':
                 # element.submit() 会直接刷新页面, 无法达到理想效果?
-                if self._button_click_mode == 'submit':
+                if self.button_click_mode == 'submit':
                     element.submit()
                 else:
                     element.click()

@@ -341,7 +341,7 @@ class MainWindow:
                     self.password_y_text.get(0.0, END)[:-1],
                     self.login_x_text.get(0.0, END)[:-1], self.login_y_text.get(0.0, END)[:-1],
                     self.brower_name_text.get(0.0, END)[:-1], self.webpath_text.get(0.0, END)[:-1], work_mode,
-                    self.auto_close_window_value_bool.get(), self.auto_close_window_value_bool.get(),
+                    self.auto_start_value_bool.get(), self.auto_close_window_value_bool.get(),
                     self.guard_service_value_bool.get()
                 )
             elif work_mode == 2:

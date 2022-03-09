@@ -77,6 +77,8 @@ class Login:
                 #     element.click()
                 js = 'document.getElementById("' + id_str + '").click()'
                 self.driver.execute_script(js)
+                # 等待5s, 防止过快响应导致login不成功
+                time.sleep(5)
 
     def run(self):
         # 执行login

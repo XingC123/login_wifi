@@ -32,7 +32,12 @@ class Login:
         self.init_webdriver(self.driver_path)
 
     def init_webdriver(self, driver_path):
-        self.driver = webdriver.ChromiumEdge(executable_path=driver_path)
+        if self.Alpha_object[custom_constant.webdriver_type] == 'Microsoft edge Chromium':
+            self.driver = webdriver.ChromiumEdge(executable_path=driver_path)
+        elif self.Alpha_object[custom_constant.webdriver_type] == 'Chrome':
+            self.driver = webdriver.Chrome(executable_path=driver_path)
+        elif self.Alpha_object[custom_constant.webdriver_type] == 'Firefox':
+            self.driver = webdriver.Firefox(executable_path=driver_path)
 
     def open_url(self, url):
         # 打开页面

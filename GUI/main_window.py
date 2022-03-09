@@ -253,6 +253,8 @@ class MainWindow:
             def stop_work():
                 if event.is_set() is False:
                     stop_with_main_thread.stop_thread(execute_thread)
+                    # 配置加载完需要更新的界面
+                    self.load_element_by_mode()
 
             def check_finish():
                 event.wait()
@@ -433,6 +435,8 @@ class MainWindow:
     def load_config(self, mode='normal'):
         try:
             self.load_config_main(mode)
+            # 配置加载完需要更新的界面
+            self.load_element_by_mode()
         except Exception as ex:
             print("load_config(self, mode='normal'): 出现如下异常: %s" % ex)
             custom_messagebox.CustomMessagebox(self.root_window, '加载配置', 300, 200, ['加载失败', '配置文件损坏, 所需参数丢失'], True)

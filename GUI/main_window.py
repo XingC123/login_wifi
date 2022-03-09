@@ -234,9 +234,9 @@ class MainWindow:
                 self.save_config()
             except Exception as ex:
                 print("__init__: save_config(): 出现如下异常: %s" % ex)
-                custom_messagebox.CustomMessagebox(self.root_window, '保存配置', 300, 200, ['保存失败', '参数不能为空'])
+                custom_messagebox.CustomMessagebox(self.root_window, '保存配置', 300, 200, ['保存失败', '参数不能为空'], True)
             else:
-                custom_messagebox.CustomMessagebox(self.root_window, '保存配置', 300, 200, ['保存成功'])
+                custom_messagebox.CustomMessagebox(self.root_window, '保存配置', 300, 200, ['保存成功'], True)
 
         Button(config_button_frame, text='保存到本地配置', command=save_config).grid(row=0, column=0)
         # 加载配置
@@ -319,6 +319,10 @@ class MainWindow:
             self.login_y_text['state'] = DISABLED
             # 登录所使用的浏览器名称
             self.brower_name_text['state'] = DISABLED
+            # 弹窗提示
+            custom_messagebox.CustomMessagebox(self.root_window, 'ALPHA模式 说明', 400, 300,
+                                               ['ALPHA模式 目前尚不完善, 在执行 login 后会自动结束任务而不会返回任何结果。请确保你的账号以及密码正确无误!'],
+                                               True)
 
     # 其他方法
     def get_cur_work_mode(self):
@@ -421,7 +425,7 @@ class MainWindow:
 
             self.login_work_state = False
         else:
-            custom_messagebox.CustomMessagebox(self.root_window, "连接wifi", 300, 200, ['已连接网络, 无需重复认证'])
+            custom_messagebox.CustomMessagebox(self.root_window, "连接wifi", 300, 200, ['已连接网络, 无需重复认证'], True)
 
     def get_xy(self, x_element, y_element):
         get_xy_window.GetXY(self.root_window, x_element, y_element)
@@ -431,11 +435,11 @@ class MainWindow:
             self.load_config_main(mode)
         except Exception as ex:
             print("load_config(self, mode='normal'): 出现如下异常: %s" % ex)
-            custom_messagebox.CustomMessagebox(self.root_window, '加载配置', 300, 200, ['加载失败', '配置文件损坏, 所需参数丢失'])
+            custom_messagebox.CustomMessagebox(self.root_window, '加载配置', 300, 200, ['加载失败', '配置文件损坏, 所需参数丢失'], True)
         else:
             if not self.auto_start_value_bool.get():
                 # 如果不需要自动登录, 则显示加载结果
-                custom_messagebox.CustomMessagebox(self.root_window, '加载配置', 300, 200, ['加载成功'])
+                custom_messagebox.CustomMessagebox(self.root_window, '加载配置', 300, 200, ['加载成功'], True)
 
     def force_load_config(self):
         self.load_config('force')

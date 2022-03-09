@@ -71,10 +71,12 @@ class Login:
                 element.send_keys(self.password_str)
             elif element_type == 'button':
                 # element.submit() 会直接刷新页面, 无法达到理想效果?
-                if self.button_click_mode == 'submit':
-                    element.submit()
-                else:
-                    element.click()
+                # if self.button_click_mode == 'submit':
+                #     element.submit()
+                # else:
+                #     element.click()
+                js = 'document.getElementById("' + id_str + '").click()'
+                self.driver.execute_script(js)
 
     def run(self):
         # 执行login

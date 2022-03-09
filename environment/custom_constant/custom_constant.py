@@ -46,6 +46,10 @@ account_id = 'account_id'
 pwd_id = 'pwd_id'
 login_id = 'login_id'
 button_click_mode = 'button_click_mode'
+func_object = 'func_object'
+# 22.3.9
+normal_object = 'normal_object'
+alpha_object = 'alpha_object'
 
 
 # 字体

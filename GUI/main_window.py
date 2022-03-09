@@ -16,13 +16,13 @@ import environment.config.main_config as main_config
 import lib.necessary_lib as necessary_lib
 import lib.stop_with_main_thread as stop_with_main_thread
 import lib.tools as venusTools
-from lib.custom_config_object import AlphaLoginObject
+from lib.custom_config_object import AlphaLoginObject, NormalLoginObject
 # GUI
 from GUI import get_xy_window
 from environment.custom_constant import custom_constant
 import GUI.custom_messagebox as custom_messagebox
 # func
-from func.login_webdriver import LoginGiwifi
+from func.login_webdriver import Login
 
 
 class MainWindow:
@@ -32,6 +32,10 @@ class MainWindow:
     def __init__(self, work_path):
         # 创建配置文件
         self.root_config = environment.config.main_config.MainConfig(work_path)
+
+        # 窗口内元素配置对象
+        self.normal_object = None
+        self.alpha_object = None
 
         # 是否正在执行login任务
         self.login_work_state = False
@@ -58,6 +62,7 @@ class MainWindow:
         # 运行模式
         work_mode_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
         work_mode_frame.grid(row=currow(), column=0)
+        self.all_work_mode = [1, 2]  # 所有运行模式
         self.work_mode_value_int = IntVar()
         self.work_mode_value_int.set(1)
         Label(work_mode_frame, text='运行模式').grid(row=0, column=0, columnspan=2)
@@ -272,6 +277,7 @@ class MainWindow:
         self.root_window.mainloop()
 
     # 方法
+    # 窗口控件
     def init_root_window(self):
         # 初始化主窗口
         necessary_lib.fit_screen_zoom(self.root_window)
@@ -314,6 +320,48 @@ class MainWindow:
             # 登录所使用的浏览器名称
             self.brower_name_text['state'] = DISABLED
 
+    # 其他方法
+    def get_cur_work_mode(self):
+        # 返回当前工作模式
+        return self.work_mode_value_int.get()
+
+    def generate_object(self, work_mode):
+        # 生成登录对象
+        try:
+            if work_mode == 1:
+                if self.alpha_object is not None:
+                    self.alpha_object = None
+                # 创建 普通模式 配置对象
+                self.normal_object = NormalLoginObject()
+                # 生成
+                self.normal_object.set_normal_object(
+                    self.account_text.get(0.0, END)[:-1], self.account_x_text.get(0.0, END)[:-1],
+                    self.account_y_text.get(0.0, END)[:-1],
+                    self.password_text.get(0.0, END)[:-1], self.password_x_text.get(0.0, END)[:-1],
+                    self.password_y_text.get(0.0, END)[:-1],
+                    self.login_x_text.get(0.0, END)[:-1], self.login_y_text.get(0.0, END)[:-1],
+                    self.brower_name_text.get(0.0, END)[:-1], self.webpath_text.get(0.0, END)[:-1], work_mode,
+                    self.auto_close_window_value_bool.get(), self.auto_close_window_value_bool.get(),
+                    self.guard_service_value_bool.get()
+                )
+            elif work_mode == 2:
+                if self.normal_object is not None:
+                    self.normal_object = None
+                # 创建 ALPHA模式 配置对象
+                self.alpha_object = AlphaLoginObject()
+                # 生成
+                self.alpha_object.set_alpha_object(
+                    self.account_text.get(0.0, END)[:-1], self.password_text.get(0.0, END)[:-1],
+                    self.webpath_text.get(0.0, END)[:-1], work_mode,
+                    self.webdriver_type_combobox.get(), self.webdriver_path_text.get(0.0, END)[:-1],
+                    self.account_id_text.get(0.0, END)[:-1], self.password_id_text.get(0.0, END)[:-1],
+                    self.login_id_text.get(0.0, END)[:-1], self.login_id_click_mode_value_str.get(),
+                    self.auto_close_window_value_bool.get(), self.auto_close_window_value_bool.get(),
+                    self.guard_service_value_bool.get()
+                )
+        except:
+            raise ValueError('generate_object(self): 生成对象失败')
+
     def login_wifi(self):
         self.login_wifi_main()
 
@@ -322,78 +370,55 @@ class MainWindow:
 
     def login_wifi_main(self):
         if not venusTools.check_internet():
-            webpath = self.webpath_text.get("0.0", END)
-            if webpath != '':
-                account = self.account_text.get("0.0", END)
-                password = self.password_text.get("0.0", END)
-                account_x = self.account_x_text.get(0.0, END)
-                account_y = self.account_y_text.get(0.0, END)
-                password_x = self.password_x_text.get(0.0, END)
-                password_y = self.password_y_text.get(0.0, END)
-                login_x = self.login_x_text.get(0.0, END)
-                login_y = self.login_y_text.get(0.0, END)
-                brower_name = self.brower_name_text.get(0.0, END)[::-1].replace('\r', '').replace('\n', '')[::-1]
-                work_mode = self.work_mode_value_int.get()
-                # ALPHA模式
-                webdriver_path = self.webdriver_path_text.get(0.0, END)
-                webdriver_type = self.webdriver_type_combobox.get()
-                account_id = self.account_id_text.get(0.0, END)
-                password_id = self.password_id_text.get(0.0, END)
-                login_id = self.login_id_text.get(0.0, END)
+            # 标记login任务状态
+            self.login_work_state = True
+            if self.get_cur_work_mode() == 1:
+                if self.normal_object is None:
+                    self.generate_object(self.get_cur_work_mode())
+                # 打开网址
+                webbrowser.open(self.normal_object.normal_object[custom_constant.webpath])
+                while True:
+                    if venusTools.proc_exist(self.normal_object.normal_object[custom_constant.brower_name]):
+                        time.sleep(10)
+                        break
+                    time.sleep(5)
 
-                if work_mode == 1 and account != '' and password != '' and \
-                        account_x != '' and account_y != '' and \
-                        password_x != '' and password_y != '' and \
-                        login_x != '' and login_y != '' and \
-                        brower_name != '' or \
-                        work_mode == 2 and webdriver_path != '' and webdriver_type != '' and \
-                        account_id != '' and password_id != '' and login_id != '':
-                    # 标记login任务状态
-                    self.login_work_state = True
-                    if work_mode == 1:
-                        # 打开网址
-                        webbrowser.open(webpath)
-                        while True:
-                            if venusTools.proc_exist(brower_name):
-                                time.sleep(10)
-                                break
-                            time.sleep(5)
+                # 输入账号
+                pyautogui.click(int(self.normal_object.normal_object[custom_constant.account_x]),
+                                int(self.normal_object.normal_object[custom_constant.account_y]))
+                pyperclip.copy(self.normal_object.normal_object[custom_constant.account])
+                time.sleep(5)
+                pyautogui.hotkey('ctrl', 'v')
+                time.sleep(5)
 
-                        # 输入账号
-                        pyautogui.click(int(account_x), int(account_y))
-                        pyperclip.copy(account)
-                        time.sleep(5)
-                        pyautogui.hotkey('ctrl', 'v')
-                        time.sleep(5)
+                # 点击其他地方
+                pyautogui.click(10, 400)
+                time.sleep(2)
 
-                        # 点击其他地方
-                        pyautogui.click(10, 400)
-                        time.sleep(2)
+                # 输入密码
+                pyautogui.click(int(self.normal_object.normal_object[custom_constant.password_x]),
+                                int(self.normal_object.normal_object[custom_constant.password_y]))
+                pyperclip.copy(self.normal_object.normal_object[custom_constant.password])
+                time.sleep(5)
+                pyautogui.hotkey('ctrl', 'v')
+                time.sleep(5)
 
-                        # 输入密码
-                        pyautogui.click(int(password_x), int(password_y))
-                        pyperclip.copy(password)
-                        time.sleep(5)
-                        pyautogui.hotkey('ctrl', 'v')
-                        time.sleep(5)
+                # 点击登录
+                pyautogui.click(int(self.normal_object.normal_object[custom_constant.login_x]),
+                                int(self.normal_object.normal_object[custom_constant.login_y]))
 
-                        # 点击登录
-                        pyautogui.click(int(login_x), int(login_y))
+                #
+                pyperclip.copy('自动登录')
+            elif self.get_cur_work_mode() == 2:
+                if self.alpha_object is None:
+                    self.generate_object(self.get_cur_work_mode())
+                Login(self.alpha_object)
 
-                        #
-                        pyperclip.copy('自动登录')
-                    elif work_mode == 2:
-                        # LoginGiwifi(self.webdriver_path_text, webpath, account, password).run()
-                        LoginGiwifi(AlphaLoginObject(account, password, webpath,
-                                                     self.webdriver_path_text.get(0.0, END),
-                                                     account_id, password_id, login_id,
-                                                     self.login_id_click_mode_value_str.get())).run()
+            # 自动关闭窗口
+            if self.auto_close_window_value_bool.get():
+                self.root_window.destroy()
 
-                    # 自动关闭窗口
-                    if self.auto_close_window_value_bool.get():
-                        self.root_window.destroy()
-
-                    self.login_work_state = False
+            self.login_work_state = False
         else:
             custom_messagebox.CustomMessagebox(self.root_window, "连接wifi", 300, 200, ['已连接网络, 无需重复认证'])
 
@@ -417,148 +442,139 @@ class MainWindow:
     def load_config_main(self, mode):
         # 加载本地配置
         self.root_config.read_config()
-        # 账号
-        account = self.root_config.get_value(custom_constant.userconfig, custom_constant.account)
-        account_x = self.root_config.get_value(custom_constant.userconfig, custom_constant.account_x)
-        account_y = self.root_config.get_value(custom_constant.userconfig, custom_constant.account_y)
-        # 密码
-        password = self.root_config.get_value(custom_constant.userconfig, custom_constant.password)
-        password_x = self.root_config.get_value(custom_constant.userconfig, custom_constant.password_x)
-        password_y = self.root_config.get_value(custom_constant.userconfig, custom_constant.password_y)
-        # 登录按钮
-        login_x = self.root_config.get_value(custom_constant.userconfig, custom_constant.login_x)
-        login_y = self.root_config.get_value(custom_constant.userconfig, custom_constant.login_y)
-        # 自动执行
-        autoStart = self.root_config.get_value(custom_constant.userconfig, custom_constant.autoStart)
-        # 自动关闭
-        autoClose = self.root_config.get_value(custom_constant.userconfig, custom_constant.autoClose)
-        # 网址
-        webpath = self.root_config.get_value(custom_constant.userconfig, custom_constant.webpath)
-        # 守护进程
-        guard_service = self.root_config.get_value(custom_constant.userconfig, custom_constant.guard_service)
-        # 登录所使用的浏览器进程名
-        brower_name = self.root_config.get_value(custom_constant.userconfig, custom_constant.brower_name)
         # 工作模式
         work_mode = venusTools.str2int(self.root_config.get_value(custom_constant.userconfig,
                                                                   custom_constant.work_mode))
-        # ALPHA
-        webdriver_type = self.root_config.get_value(custom_constant.userconfig, custom_constant.webdriver_type)
-        webdriver_path = self.root_config.get_value(custom_constant.userconfig, custom_constant.webdriver_path)
-        account_id = self.root_config.get_value(custom_constant.userconfig, custom_constant.account_id)
-        password_id = self.root_config.get_value(custom_constant.userconfig, custom_constant.pwd_id)
-        login_id = self.root_config.get_value(custom_constant.userconfig, custom_constant.login_id)
-        button_click_mode = self.root_config.get_value(custom_constant.userconfig, custom_constant.button_click_mode)
-
-        if mode == 'force' or work_mode == 1 and account != '' and account_x != '' and account_y != '' and \
-                password != '' and password_x != '' and password_y != '' and \
-                login_x != '' and login_y != '' and \
-                webpath != '' and \
-                brower_name != '' or \
-                work_mode == 2 and webdriver_path != '' and webdriver_type != '' and \
-                account_id != '' and password_id != '' and login_id != '':
-            try:
-                MainWindow.set_value(self.account_text, account)
-                MainWindow.set_value(self.account_x_text, account_x)
-                MainWindow.set_value(self.account_y_text, account_y)
-                MainWindow.set_value(self.password_text, password)
-                MainWindow.set_value(self.password_x_text, password_x)
-                MainWindow.set_value(self.password_y_text, password_y)
-                MainWindow.set_value(self.login_x_text, login_x)
-                MainWindow.set_value(self.login_y_text, login_y)
-                MainWindow.set_value(self.auto_start_value_bool, autoStart)
-                MainWindow.set_value(self.auto_close_window_value_bool, autoClose)
-                MainWindow.set_value(self.webpath_text, webpath)
-                MainWindow.set_value(self.guard_service_value_bool, guard_service)
-                MainWindow.set_value(self.brower_name_text, brower_name)
-                MainWindow.set_value(self.work_mode_value_int, work_mode)
-                MainWindow.set_value(self.webdriver_type_value_str, webdriver_type)
-                MainWindow.set_value(self.webdriver_path_text, webdriver_path)
-                MainWindow.set_value(self.account_id_text, account_id)
-                MainWindow.set_value(self.password_id_text, password_id)
-                MainWindow.set_value(self.login_id_text, login_id)
-                MainWindow.set_value(self.login_id_click_mode_value_str, button_click_mode)
-            except Exception as e:
-                print('ERROR: 强制加载配置: ', end=', ')
-                print(e)
-
+        print('workmode = [', work_mode, ']')
+        if work_mode in self.all_work_mode:
+            if work_mode == 1:
+                self.normal_object = NormalLoginObject()
+                self.normal_object.normal_object = eval(
+                    self.root_config.get_value(custom_constant.userconfig, custom_constant.normal_object))
+                if mode == 'force' or self.normal_object.check_config():
+                    # 账号
+                    MainWindow.set_value(self.account_text,
+                                         self.normal_object.normal_object[custom_constant.account])
+                    MainWindow.set_value(self.account_x_text,
+                                         self.normal_object.normal_object[custom_constant.account_x])
+                    MainWindow.set_value(self.account_y_text,
+                                         self.normal_object.normal_object[custom_constant.account_y])
+                    # 密码
+                    MainWindow.set_value(self.password_text,
+                                         self.normal_object.normal_object[custom_constant.password])
+                    MainWindow.set_value(self.password_x_text,
+                                         self.normal_object.normal_object[custom_constant.password_x])
+                    MainWindow.set_value(self.password_y_text,
+                                         self.normal_object.normal_object[custom_constant.password_y])
+                    # 登录
+                    MainWindow.set_value(self.login_x_text,
+                                         self.normal_object.normal_object[custom_constant.login_x])
+                    MainWindow.set_value(self.login_y_text,
+                                         self.normal_object.normal_object[custom_constant.login_y])
+                    # 浏览器进程名
+                    MainWindow.set_value(self.brower_name_text,
+                                         self.normal_object.normal_object[custom_constant.brower_name])
+                    # 基础功能
+                    # 网址
+                    MainWindow.set_value(self.webpath_text,
+                                         self.normal_object.normal_object[custom_constant.func_object][
+                                             custom_constant.webpath])
+                    # 工作模式
+                    MainWindow.set_value(self.work_mode_value_int,
+                                         work_mode)
+                    # 自动关闭
+                    MainWindow.set_value(self.auto_close_window_value_bool,
+                                         self.normal_object.normal_object[custom_constant.func_object][
+                                             custom_constant.autoClose])
+                    # 自动执行
+                    MainWindow.set_value(self.auto_start_value_bool,
+                                         self.normal_object.normal_object[custom_constant.func_object][
+                                             custom_constant.autoStart])
+                    # 守护进程
+                    MainWindow.set_value(self.guard_service_value_bool,
+                                         self.normal_object.normal_object[custom_constant.func_object][
+                                             custom_constant.guard_service])
+                else:
+                    raise ValueError('load_config_main(self, mode): 配置损坏')
+            elif work_mode == 2:
+                self.alpha_object = AlphaLoginObject()
+                self.alpha_object.alpha_object = eval(
+                    self.root_config.get_value(custom_constant.userconfig, custom_constant.alpha_object))
+                if mode == 'force' or self.alpha_object.check_config():
+                    # 账号
+                    MainWindow.set_value(self.account_text,
+                                         self.alpha_object.alpha_object[custom_constant.account])
+                    # 密码
+                    MainWindow.set_value(self.password_text,
+                                         self.alpha_object.alpha_object[custom_constant.password])
+                    # 浏览器驱动地址
+                    MainWindow.set_value(self.webdriver_path_text,
+                                         self.alpha_object.alpha_object[custom_constant.webdriver_path])
+                    # 浏览器类型
+                    MainWindow.set_value(self.webdriver_type_value_str,
+                                         self.alpha_object.alpha_object[custom_constant.webdriver_type])
+                    # 账号框id
+                    MainWindow.set_value(self.account_id_text,
+                                         self.alpha_object.alpha_object[custom_constant.account_id])
+                    # 密码框id
+                    MainWindow.set_value(self.password_id_text,
+                                         self.alpha_object.alpha_object[custom_constant.pwd_id])
+                    # 登录按钮id
+                    MainWindow.set_value(self.login_id_text,
+                                         self.alpha_object.alpha_object[custom_constant.login_id])
+                    # 按钮点击类型
+                    MainWindow.set_value(self.login_id_click_mode_value_str,
+                                         self.alpha_object.alpha_object[custom_constant.button_click_mode])
+                    # 基础功能
+                    # 网址
+                    MainWindow.set_value(self.webpath_text,
+                                         self.alpha_object.alpha_object[custom_constant.func_object][
+                                             custom_constant.webpath])
+                    # 工作模式
+                    MainWindow.set_value(self.work_mode_value_int,
+                                         work_mode)
+                    # 自动关闭
+                    MainWindow.set_value(self.auto_close_window_value_bool,
+                                         self.alpha_object.alpha_object[custom_constant.func_object][
+                                             custom_constant.autoClose])
+                    # 自动执行
+                    MainWindow.set_value(self.auto_start_value_bool,
+                                         self.alpha_object.alpha_object[custom_constant.func_object][
+                                             custom_constant.autoStart])
+                    # 守护进程
+                    MainWindow.set_value(self.guard_service_value_bool,
+                                         self.alpha_object.alpha_object[custom_constant.func_object][
+                                             custom_constant.guard_service])
+                else:
+                    raise ValueError('load_config_main(self, mode): 配置损坏')
             if mode == 'boot':
                 if self.auto_start_value_bool.get():
                     time.sleep(5)
                     self.login_wifi()
         else:
-            raise ValueError("参数不全")
+            raise ValueError("load_config_main(self, mode): 参数不全")
 
     def save_config(self):
         # 保存配置
-        account = self.account_text.get(0.0, END)
-        account_x = self.account_x_text.get(0.0, END)
-        account_y = self.account_y_text.get(0.0, END)
-        password = self.password_text.get(0.0, END)
-        password_x = self.password_x_text.get(0.0, END)
-        password_y = self.password_y_text.get(0.0, END)
-        login_x = self.login_x_text.get(0.0, END)
-        login_y = self.login_y_text.get(0.0, END)
-        webpath = self.webpath_text.get(0.0, END)
-        brower_name = self.brower_name_text.get(0.0, END)
-        work_mode = self.work_mode_value_int.get()
-        # ALPHA模式
-        webdriver_path = self.webdriver_path_text.get(0.0, END)
-        webdriver_type = self.webdriver_type_combobox.get()
-        account_id = self.account_id_text.get(0.0, END)
-        password_id = self.password_id_text.get(0.0, END)
-        login_id = self.login_id_text.get(0.0, END)
-
-        if work_mode == 1 and account != '' and account_x != '' and account_y != '' and \
-                password != '' and password_x != '' and password_y != '' and \
-                login_x != '' and login_y != '' and \
-                webpath != '' and \
-                brower_name != '' or \
-                work_mode == 2 and webdriver_path != '' and webdriver_type != '' and \
-                account_id != '' and password_id != '' and login_id != '':
-            # 账号
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.account, account)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.account_x, account_x)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.account_y, account_y)
-            # 密码
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.password, password)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.password_x, password_x)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.password_y, password_y)
-            # 登录按钮
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.login_x, login_x)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.login_y, login_y)
-            # 自动执行
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.autoStart,
-                                       self.auto_start_value_bool.get())
-            # 自动关闭
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.autoClose,
-                                       self.auto_close_window_value_bool.get())
-            # 网址
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.webpath,
-                                       webpath)
-            # 守护进程
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.guard_service,
-                                       self.guard_service_value_bool.get())
-            # 登录所使用的浏览器的名称
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.brower_name,
-                                       brower_name)
-            # 运行模式
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.work_mode,
-                                       work_mode)
-            # ALPHA模式
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.webdriver_type,
-                                       webdriver_type)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.webdriver_path,
-                                       webdriver_path)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.account_id,
-                                       account_id)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.pwd_id,
-                                       password_id)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.login_id,
-                                       login_id)
-            self.root_config.set_value(custom_constant.userconfig, custom_constant.button_click_mode,
-                                       self.login_id_click_mode_value_str.get())
+        work_mode = self.get_cur_work_mode()
+        if work_mode == 1:
+            self.generate_object(work_mode)
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.work_mode, work_mode)
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.normal_object,
+                                       self.normal_object.normal_object)
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.func_object,
+                                       self.normal_object.func_object.func_object)
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.alpha_object, '')
+        elif work_mode == 2:
+            self.generate_object(work_mode)
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.work_mode, work_mode)
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.alpha_object,
+                                       self.alpha_object.alpha_object)
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.func_object,
+                                       self.alpha_object.func_object.func_object)
+            self.root_config.set_value(custom_constant.userconfig, custom_constant.normal_object, '')
         else:
-            raise ValueError("参数不全")
+            raise ValueError("save_config(self): 参数不全")
 
     # 守护进程
     def guard_service(self):

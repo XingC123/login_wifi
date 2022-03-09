@@ -3,36 +3,33 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
 
+from environment.custom_constant import custom_constant
 
-class LoginGiwifi:
+
+class Login:
     def __init__(self, alpha_object):
         # 变量定义
         self.Alpha_object = alpha_object
         # 驱动路径
-        self.driver_path = ''
+        self.driver_path = self.Alpha_object[custom_constant.webdriver_path]
         # 网址
-        self.url = ''
+        self.url = self.Alpha_object[custom_constant.webpath]
         # 账号 & 密码
-        self.account_str = ''
-        self.password_str = ''
+        self.account_str = self.Alpha_object[custom_constant.account]
+        self.password_str = self.Alpha_object[custom_constant.password]
         # hook元素的id
-        self.account_id = ''
-        self.pwd_id = ''
-        self.login_id = ''
+        self.account_id = self.Alpha_object[custom_constant.account_id]
+        self.pwd_id = self.Alpha_object[custom_constant.pwd_id]
+        self.login_id = self.Alpha_object[custom_constant.login_id]
         # 初始化一个drive
         self.driver = None
         # hook的giwifi元素数组
         self.element_list = [self.account_id, self.pwd_id, self.login_id]
         # 按钮点击方式
-        self._button_click_mode = ''
+        self._button_click_mode = self.Alpha_object[custom_constant.button_click_mode]
 
         # 初始化
-        self.init_config()
         self.init_webdriver(self.driver_path)
-
-    def init_config(self):
-        self.account_str, self.password_str, self.url, self.driver_path, self.account_id, self.pwd_id, self.login_id, \
-            self._button_click_mode = self.Alpha_object.get_object_elements()
 
     def init_webdriver(self, driver_path):
         self.driver = webdriver.ChromiumEdge(executable_path=driver_path)

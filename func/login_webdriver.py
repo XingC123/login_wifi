@@ -25,7 +25,7 @@ class Login:
         self.login_id = self.Alpha_object[custom_constant.login_id]
         # 初始化一个drive
         self.driver = None
-        # hook的giwifi元素数组
+        # hook的登录元素数组
         self.element_list = [self.account_id, self.pwd_id, self.login_id]
         # 按钮点击方式
         self.button_click_mode = self.Alpha_object[custom_constant.button_click_mode]
@@ -34,10 +34,42 @@ class Login:
         self.init_webdriver(self.driver_path)
 
     def init_webdriver(self, driver_path):
-        if self.Alpha_object[custom_constant.webdriver_type] == 'Microsoft edge Chromium':
-            self.driver = webdriver.ChromiumEdge(executable_path=driver_path)
-        elif self.Alpha_object[custom_constant.webdriver_type] == 'Chrome':
-            self.driver = webdriver.Chrome(executable_path=driver_path)
+        if self.Alpha_object[custom_constant.webdriver_type].startswith('Microsoft edge Chromium') or \
+                self.Alpha_object[custom_constant.webdriver_type] == 'Chrome':
+            # Microsoft Edge Chromium
+            # Microsoft Edge 80及更高版本有了重大更新：不再支持使用ChromeDriver和ChromeOptions自动化或测试Microsoft Edge (Chromium)
+            if self.Alpha_object[custom_constant.webdriver_type] == 'Microsoft edge Chromium 80 以下' or \
+                    self.Alpha_object[custom_constant.webdriver_type] == 'Chrome':
+                driver_options = webdriver.ChromeOptions()
+            else:
+                # edge 80以上
+                driver_options = webdriver.EdgeOptions()
+                driver_options.use_chromium = True
+
+            # 支持拓展
+            driver_options.add_experimental_option('useAutomationExtension', False)
+            # 隐藏自动化测试提示
+            # 修改window.navigator.webdriver，防机器人识别机制，selenium自动登陆判别机制
+            # CDP执行JavaScript 代码  重定义windows.navigator.webdriver的值
+            driver_options.add_experimental_option('excludeSwitches', ['enable-automation', 'enable-logging'])
+
+            if self.Alpha_object[custom_constant.webdriver_type] == 'Microsoft edge Chromium 80 以下' or \
+                    self.Alpha_object[custom_constant.webdriver_type] == 'Chrome':
+                # 创建driver对象
+                self.driver = webdriver.Chrome(executable_path=driver_path, options=driver_options)
+            else:
+                # 创建driver对象
+                self.driver = webdriver.ChromiumEdge(executable_path=driver_path, options=driver_options)
+
+            # 修改window.navigator.webdriver，防机器人识别机制，selenium自动登陆判别机制
+            # CDP执行JavaScript 代码  重定义windows.navigator.webdriver的值
+            self.driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+                "source": """
+                    Object.defineProperty(navigator, 'webdriver', {
+                      get: () => undefined
+                    })
+                  """
+            })
         elif self.Alpha_object[custom_constant.webdriver_type] == 'Firefox':
             self.driver = webdriver.Firefox(executable_path=driver_path)
 
@@ -79,6 +111,8 @@ class Login:
                 self.driver.execute_script(js)
                 # 等待5s, 防止过快响应导致login不成功
                 time.sleep(5)
+
+                self.driver.close()
 
     def run(self):
         # 执行login

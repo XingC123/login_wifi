@@ -157,10 +157,10 @@ class MainWindow:
         Label(webdriver_frame, text='* 默认浏览器类型').grid(row=0, column=0)
         self.webdriver_type_value_str = StringVar()
         self.webdriver_type_value_str.set('Microsoft edge Chromium')
-        webdriver_type_list = ['Microsoft edge Chromium', 'Chrome', 'Firefox']
+        self.webdriver_type_list = ['Microsoft edge Chromium 80 以下', 'Microsoft edge Chromium', 'Chrome', 'Firefox']
         self.webdriver_type_combobox = ttk.Combobox(webdriver_frame, height=3, width=25, state='readonly',
                                                     textvariable=self.webdriver_type_value_str,
-                                                    values=webdriver_type_list)
+                                                    values=self.webdriver_type_list)
         self.webdriver_type_combobox.grid(row=0, column=1)
         Label(webdriver_frame, text='* 浏览器驱动地址').grid(row=1, column=0)
         self.webdriver_path_text = Text(webdriver_frame, height=3, width=30)
@@ -520,8 +520,11 @@ class MainWindow:
                     MainWindow.set_value(self.webdriver_path_text,
                                          self.alpha_object.alpha_object[custom_constant.webdriver_path])
                     # 浏览器类型
-                    MainWindow.set_value(self.webdriver_type_value_str,
-                                         self.alpha_object.alpha_object[custom_constant.webdriver_type])
+                    if self.alpha_object.alpha_object[custom_constant.webdriver_type] in self.webdriver_type_list:
+                        MainWindow.set_value(self.webdriver_type_value_str,
+                                             self.alpha_object.alpha_object[custom_constant.webdriver_type])
+                    else:
+                        raise ValueError('load_config_main(self, mode): 浏览器类型错误')
                     # 账号框id
                     MainWindow.set_value(self.account_id_text,
                                          self.alpha_object.alpha_object[custom_constant.account_id])

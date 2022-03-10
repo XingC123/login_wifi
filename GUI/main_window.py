@@ -26,8 +26,8 @@ from func.login_webdriver import Login
 
 
 class MainWindow:
-    width_root_window = 600
-    height_root_window = 900
+    width_root_window = 1000
+    height_root_window = 600
 
     def __init__(self, work_path):
         # 创建配置文件
@@ -45,11 +45,23 @@ class MainWindow:
         self.root_window = Tk()
 
         # 主框架
-        self.main_frame = Frame(self.root_window,
+        self.root_frame = Frame(self.root_window,
                                 width=MainWindow.width_root_window,
                                 height=MainWindow.height_root_window)
-        self.main_frame.pack_propagate(False)
-        self.main_frame.pack()
+        self.root_frame.pack_propagate(False)
+        self.root_frame.pack()
+        # 框架1
+        self.main_frame1 = Frame(self.root_frame,
+                                 width=MainWindow.width_root_window / 2,
+                                 height=MainWindow.height_root_window)
+        self.main_frame1.pack_propagate(False)
+        self.main_frame1.pack(side=LEFT)
+        # 框架2
+        self.main_frame2 = Frame(self.root_frame,
+                                 width=MainWindow.width_root_window / 2,
+                                 height=MainWindow.height_root_window)
+        self.main_frame2.pack_propagate(False)
+        self.main_frame2.pack(side=LEFT)
 
         # 主frame的grid布局行号
         now_row = 0
@@ -61,7 +73,7 @@ class MainWindow:
             return now_row
 
         # 运行模式
-        work_mode_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
+        work_mode_frame = Frame(self.main_frame1, bd=1, relief=GROOVE)
         work_mode_frame.grid(row=currow(), column=0)
         self.all_work_mode = [1, 2]  # 所有运行模式
         self.work_mode_value_int = IntVar()
@@ -80,11 +92,11 @@ class MainWindow:
         Label(work_mode_frame, text='注: 带 * 项目为 [ALPHA模式] 必须参数').grid(row=2, column=0, columnspan=2)
 
         # 账号框
-        account_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
+        account_frame = Frame(self.main_frame1, bd=1, relief=GROOVE)
         account_frame.grid(row=currow(), column=0)
         Label(account_frame, text="* 账号").grid(row=0, column=0)
         self.account_text = Text(account_frame, height=1, width=20)
-        self.account_text.grid(row=0, column=1)
+        self.account_text.grid(row=0, column=1, columnspan=3)
         # x坐标
         Label(account_frame, text='x坐标').grid(row=1, column=0)
         self.account_x_text = Text(account_frame, height=1, width=6)
@@ -100,11 +112,11 @@ class MainWindow:
         Button(account_frame, text='采集坐标', command=get_account_xy).grid(row=2, column=0, columnspan=4)
 
         # 密码框
-        password_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
+        password_frame = Frame(self.main_frame1, bd=1, relief=GROOVE)
         password_frame.grid(row=currow(), column=0)
         Label(password_frame, text="* 密码").grid(row=0, column=0)
         self.password_text = Text(password_frame, height=1, width=20)
-        self.password_text.grid(row=0, column=1)
+        self.password_text.grid(row=0, column=1, columnspan=3)
         # x坐标
         Label(password_frame, text='x坐标').grid(row=1, column=0)
         self.password_x_text = Text(password_frame, height=1, width=6)
@@ -120,7 +132,7 @@ class MainWindow:
         Button(password_frame, text='采集坐标', command=get_password_xy).grid(row=2, column=0, columnspan=4)
 
         # 登录按钮坐标
-        login_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
+        login_frame = Frame(self.main_frame1, bd=1, relief=GROOVE)
         login_frame.grid(row=currow(), column=0)
         Label(login_frame, text='登录按钮坐标').grid(row=0, column=0, columnspan=4)
         # x坐标
@@ -138,14 +150,14 @@ class MainWindow:
         Button(login_frame, text='采集坐标', command=get_login_xy).grid(row=2, column=0, columnspan=4)
 
         # 网址
-        webpath_frame = Frame(self.main_frame)
+        webpath_frame = Frame(self.main_frame1)
         webpath_frame.grid(row=currow(), column=0)
         Label(webpath_frame, text="* 网址").grid(row=0, column=0)
-        self.webpath_text = Text(webpath_frame, height=1, width=30)
+        self.webpath_text = Text(webpath_frame, height=3, width=30)
         self.webpath_text.grid(row=0, column=1)
 
         # 要打开的浏览器
-        brower_name_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
+        brower_name_frame = Frame(self.main_frame1, bd=1, relief=GROOVE)
         brower_name_frame.grid(row=currow(), column=0)
         Label(brower_name_frame, text='登录所使用的浏览器的进程名').grid(row=0, column=0)
         self.brower_name_text = Text(brower_name_frame, width=20, height=1)
@@ -153,13 +165,13 @@ class MainWindow:
         Label(brower_name_frame, text='注: 可在任务管理器运行浏览器并查看').grid(row=1, column=0, columnspan=2)
 
         # 浏览器驱动
-        webdriver_frame = Frame(self.main_frame, bd=1, relief=GROOVE)
+        webdriver_frame = Frame(self.main_frame2, bd=1, relief=GROOVE)
         webdriver_frame.grid(row=currow(), column=0)
         Label(webdriver_frame, text='* 默认浏览器类型').grid(row=0, column=0)
         self.webdriver_type_value_str = StringVar()
         self.webdriver_type_value_str.set('Microsoft edge Chromium')
-        self.webdriver_type_list = ['Microsoft edge Chromium 80 以下', 'Microsoft edge Chromium', 'Chrome', 'Firefox']
-        self.webdriver_type_combobox = ttk.Combobox(webdriver_frame, height=3, width=25, state='readonly',
+        self.webdriver_type_list = ['Microsoft edge Chromium', 'Microsoft edge Chromium 80 以下', 'Chrome', 'Firefox']
+        self.webdriver_type_combobox = ttk.Combobox(webdriver_frame, height=4, width=40, state='readonly',
                                                     textvariable=self.webdriver_type_value_str,
                                                     values=self.webdriver_type_list)
         self.webdriver_type_combobox.grid(row=0, column=1)
@@ -195,10 +207,10 @@ class MainWindow:
         Label(webdriver_frame, text='注: 若选择 [运行模式] 为 [ALPHA模式], 则此为必须参数', width=50).grid(row=8, column=0, columnspan=2)
 
         # 立即登录
-        Button(self.main_frame, text="登录", command=self.login_wifi_main).grid(row=currow(), column=0)
+        Button(self.main_frame2, text="登录", command=self.login_wifi_main).grid(row=currow(), column=0)
 
         # 自动执行
-        auto_start_frame = Frame(self.main_frame)
+        auto_start_frame = Frame(self.main_frame2)
         auto_start_frame.grid(row=currow(), column=0)
         self.auto_start_value_bool = BooleanVar()
         self.auto_start_value_bool.set(False)
@@ -208,7 +220,7 @@ class MainWindow:
         self.auto_start_checkbutton.grid(row=0, column=0)
 
         # 自动关闭窗口
-        auto_close_window_frame = Frame(self.main_frame)
+        auto_close_window_frame = Frame(self.main_frame2)
         auto_close_window_frame.grid(row=currow(), column=0)
         self.auto_close_window_value_bool = BooleanVar()
         self.auto_close_window_value_bool.set(False)
@@ -218,7 +230,7 @@ class MainWindow:
         self.auto_close_window_checkbutton.grid(row=0, column=0)
 
         # 守护进程
-        guard_service_frame = Frame(self.main_frame)
+        guard_service_frame = Frame(self.main_frame2)
         guard_service_frame.grid(row=currow(), column=0)
         self.guard_service_value_bool = BooleanVar()
         self.guard_service_value_bool.set(False)
@@ -227,7 +239,7 @@ class MainWindow:
                                                      onvalue=True, offvalue=False)
         self.guard_service_checkbutton.grid(row=0, column=0)
         # 保存配置
-        config_button_frame = Frame(self.main_frame)
+        config_button_frame = Frame(self.main_frame2)
         config_button_frame.grid(row=currow(), column=0)
 
         def save_config():

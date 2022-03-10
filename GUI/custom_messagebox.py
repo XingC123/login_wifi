@@ -48,7 +48,17 @@ class CustomMessagebox:
         parent.pack(expand=1)
         # 如果没有这一句,winfo_width()将会得到一个错误的结果
         self.msg_window.update_idletasks()
-        Message(parent, text=main_content(), width=self.msg_window.winfo_width(), font=self.ft).pack(fill=X)
+        string_list_length = len(string_list)
+        if string_list_length <= 1:
+            Message(parent, text=main_content(), width=self.msg_window.winfo_width(), font=self.ft).pack(fill=X)
+        else:
+            self.message = Text(parent, width=self.msg_window.winfo_width(), font=self.ft,
+                                relief=FLAT, bg='gray94')
+            # self.message.tag_configure("center", justify='center')  # 文本水平居中语句1
+            self.message.insert(0.0, main_content())
+            # self.message.tag_add("center", 1.0, "end")  # 文本水平居中语句2
+            self.message.pack(fill=X, anchor=CENTER)
+            self.message.configure(state=DISABLED)
         # 自定义关闭窗口方法
         self.msg_window.protocol('WM_DELETE_WINDOW', lambda: self.close())
 

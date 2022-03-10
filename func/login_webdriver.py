@@ -5,13 +5,16 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
 
+from Scripts.js import get_js_dirname
 from environment.custom_constant import custom_constant
 
 
 class Login:
-    def __init__(self, alpha_object):
+    def __init__(self, alpha_object, run_root_path):
         # 变量定义
         self.Alpha_object = alpha_object
+        # 初始化 主py 文件运行目录
+        self.run_root_path = run_root_path
         # 驱动路径
         self.driver_path = self.Alpha_object[custom_constant.webdriver_path]
         # 网址
@@ -63,12 +66,19 @@ class Login:
 
             # 修改window.navigator.webdriver，防机器人识别机制，selenium自动登陆判别机制
             # CDP执行JavaScript 代码  重定义windows.navigator.webdriver的值
+            # self.driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+            #     "source": """
+            #         Object.defineProperty(navigator, 'webdriver', {
+            #           get: () => undefined
+            #         })
+            #       """
+            # })
+            # 加载防检测selenium的js脚本
+            js_name = 'stealth.min.js'
+            with open(get_js_dirname.get_filepath_js_dir(js_name), 'r') as jsf:
+                js = jsf.read()
             self.driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-                "source": """
-                    Object.defineProperty(navigator, 'webdriver', {
-                      get: () => undefined
-                    })
-                  """
+                "source": js
             })
         elif self.Alpha_object[custom_constant.webdriver_type] == 'Firefox':
             self.driver = webdriver.Firefox(executable_path=driver_path)

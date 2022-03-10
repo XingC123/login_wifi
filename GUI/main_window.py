@@ -32,6 +32,7 @@ class MainWindow:
     def __init__(self, work_path):
         # 创建配置文件
         self.root_config = environment.config.main_config.MainConfig(work_path)
+        self.work_path = work_path
 
         # 窗口内元素配置对象
         self.normal_object = None
@@ -417,7 +418,7 @@ class MainWindow:
             elif self.get_cur_work_mode() == 2:
                 if self.alpha_object is None:
                     self.generate_object(self.get_cur_work_mode())
-                Login(self.alpha_object.alpha_object).run()
+                Login(self.alpha_object.alpha_object, self.work_path).run()
 
             # 自动关闭窗口
             if self.auto_close_window_value_bool.get():

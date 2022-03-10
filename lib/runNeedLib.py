@@ -1,6 +1,5 @@
 import os.path
 import sys
-from pathlib import Path
 
 
 def getCurRunPath(filePath):
@@ -11,3 +10,7 @@ def getCurRunPath(filePath):
     elif __file__:
         # return Path(filePath).parent
         return os.path.dirname(filePath)
+
+
+def generate_complete_filepath(dirname, filename):
+    return os.path.join(dirname, filename)

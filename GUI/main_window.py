@@ -253,8 +253,6 @@ class MainWindow:
             def stop_work():
                 if event.is_set() is False:
                     stop_with_main_thread.stop_thread(execute_thread)
-                    # 配置加载完需要更新的界面
-                    self.load_element_by_mode()
 
             def check_finish():
                 event.wait()
@@ -435,12 +433,14 @@ class MainWindow:
     def load_config(self, mode='normal'):
         try:
             self.load_config_main(mode)
-            # 配置加载完需要更新的界面
-            self.load_element_by_mode()
         except Exception as ex:
             print("load_config(self, mode='normal'): 出现如下异常: %s" % ex)
             custom_messagebox.CustomMessagebox(self.root_window, '加载配置', 300, 200, ['加载失败', '配置文件损坏, 所需参数丢失'], True)
         else:
+            if mode == 'boot':
+                if self.auto_start_value_bool.get():
+                    time.sleep(5)
+                    self.login_wifi()
             if not self.auto_start_value_bool.get():
                 # 如果不需要自动登录, 则显示加载结果
                 custom_messagebox.CustomMessagebox(self.root_window, '加载配置', 300, 200, ['加载成功'], True)
@@ -556,10 +556,9 @@ class MainWindow:
                                              custom_constant.guard_service])
                 else:
                     raise ValueError('load_config_main(self, mode): 配置损坏')
-            if mode == 'boot':
-                if self.auto_start_value_bool.get():
-                    time.sleep(5)
-                    self.login_wifi()
+
+            # 配置加载完需要更新的界面
+            self.load_element_by_mode()
         else:
             raise ValueError("load_config_main(self, mode): 参数不全")
 

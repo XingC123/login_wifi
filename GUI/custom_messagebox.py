@@ -27,7 +27,9 @@ class CustomMessagebox:
         if self.if_disable_parent:
             self.parent_window.attributes('-disable', True)
         # 主窗口
-        self.msg_window = Toplevel()
+        self.msg_window = Toplevel(self.parent_window)
+        # self.msg_window.attributes("-toolwindow", 1) # 只有 关闭 按钮(只在win生效)
+        self.msg_window.wm_attributes("-topmost", 1)  # 窗口永远在顶层
         geometry = necessary_lib.middle_screen(self.msg_window, width, height)
         # 窗口属性
         necessary_lib.fit_screen_zoom(self.msg_window)
@@ -57,6 +59,7 @@ class CustomMessagebox:
                 if auto_close and self.if_closed is False:
                     # 若窗口设置 auto_close = True ,正常情况下,线程执行成功会自动关闭,即无需执行停止线程操作,传参 False
                     self.close(False)
+
         stop_with_main_thread.StopWithMainThread(custom_func).run()
 
         # 要在新线程中调用此类,避免报错，注释掉

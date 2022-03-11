@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
 
-from Scripts.js import get_js_dirname
+from lib.selenium_anti_detection.selenium_anti_detection import selenium_anti_detection
 from environment.custom_constant import custom_constant
 
 
@@ -74,9 +74,7 @@ class Login:
             #       """
             # })
             # 加载防检测selenium的js脚本
-            js_name = 'stealth.min.js'
-            with open(get_js_dirname.get_filepath_js_dir(js_name), 'r') as jsf:
-                js = jsf.read()
+            js = selenium_anti_detection()
             self.driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
                 "source": js
             })

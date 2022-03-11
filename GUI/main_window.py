@@ -99,7 +99,13 @@ class MainWindow:
                                                        onvalue=2,
                                                        command=self.load_element_by_mode)
         self.work_mode_ALPHA_checkbutton.grid(row=1, column=1)
-        Label(work_mode_frame, text='注: 带 * 项目为 [ALPHA模式] 必须参数').grid(row=2, column=0, columnspan=2)
+        work_mode_tip_frame = Frame(work_mode_frame)
+        work_mode_tip_frame.grid(row=2, column=0, columnspan=2)
+        Label(work_mode_tip_frame, text='注意事项:').grid(row=0, column=0, columnspan=2)
+        Label(work_mode_tip_frame, text='1. 账号密码为所有模式必须。').grid(row=1, column=0)
+        Label(work_mode_tip_frame, text='2. 带 * 号为 ALPHA模式 必须，其他模式可不填。').grid(row=2, column=0)
+        Label(work_mode_tip_frame, text='3. 其余未标注项为 稳定模式 必须').grid(row=3, column=0)
+        Label(work_mode_tip_frame, text='4. 若使用 稳定模式 ，推荐保留默认浏览器后台。').grid(row=4, column=0)
 
         # 账号框
         account_frame = Frame(self.main_frame1, bd=1, relief=GROOVE)

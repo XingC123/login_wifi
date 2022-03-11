@@ -429,7 +429,7 @@ class MainWindow:
                 webbrowser.open(self.normal_object.normal_object[custom_constant.func_object][custom_constant.webpath])
                 while True:
                     if venusTools.proc_exist(self.normal_object.normal_object[custom_constant.brower_name]):
-                        time.sleep(10)
+                        time.sleep(20)
                         break
                     time.sleep(5)
 

@@ -35,7 +35,9 @@ class CustomMessagebox:
         necessary_lib.fit_screen_zoom(self.msg_window)
         self.msg_window.title(title)
         self.msg_window.geometry(geometry)
-        self.msg_window.resizable(False, False)
+        # self.msg_window.resizable(False, False)
+        self.msg_window.minsize(width, height)
+        self.msg_window.maxsize(int(width * 1.2), int(height * 1.2))
         # 字体
         self.ft = environment.custom_constant.custom_constant.CustomFont().microsoft_yahei_10
 

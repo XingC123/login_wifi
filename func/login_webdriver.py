@@ -84,6 +84,7 @@ class Login:
     def open_url(self, url):
         # 打开页面
         self.driver.get(url)
+        self.driver.maximize_window()
 
     def work_after_loaded(self, id_str):
         # input_type = ['text', 'password']

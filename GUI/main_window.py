@@ -316,7 +316,8 @@ class MainWindow:
         self.root_window.geometry(necessary_lib.middle_screen(self.root_window,
                                                               MainWindow.width_root_window,
                                                               MainWindow.height_root_window))
-        self.root_window.resizable(False, False)
+        # self.root_window.resizable(False, False)  # 禁用窗口大小调整
+        self.root_window.minsize(MainWindow.width_root_window, MainWindow.height_root_window)
 
     def init_all_elements_in_window(self):
         # 初始化主窗口

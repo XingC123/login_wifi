@@ -318,6 +318,7 @@ class MainWindow:
                                                               MainWindow.height_root_window))
         # self.root_window.resizable(False, False)  # 禁用窗口大小调整
         self.root_window.minsize(MainWindow.width_root_window, MainWindow.height_root_window)
+        self.root_window.maxsize(int(MainWindow.width_root_window * 1.5), int(MainWindow.height_root_window * 1.5))
 
     def init_all_elements_in_window(self):
         # 初始化主窗口

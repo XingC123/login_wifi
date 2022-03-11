@@ -102,7 +102,7 @@ class MainWindow:
         work_mode_tip_frame = Frame(work_mode_frame)
         work_mode_tip_frame.grid(row=2, column=0, columnspan=2)
         Label(work_mode_tip_frame, text='注意事项:').grid(row=0, column=0, columnspan=2)
-        Label(work_mode_tip_frame, text='1. 账号密码为所有模式必须。').grid(row=1, column=0)
+        Label(work_mode_tip_frame, text='1. 账号+密码+网址 为所有模式必须。').grid(row=1, column=0)
         Label(work_mode_tip_frame, text='2. 带 * 号为 ALPHA模式 必须，其他模式可不填。').grid(row=2, column=0)
         Label(work_mode_tip_frame, text='3. 其余未标注项为 稳定模式 必须').grid(row=3, column=0)
         Label(work_mode_tip_frame, text='4. 若使用 稳定模式 ，推荐保留默认浏览器后台。').grid(row=4, column=0)
@@ -184,7 +184,7 @@ class MainWindow:
         webdriver_frame = Frame(self.main_frame2, bd=1, relief=GROOVE)
         webdriver_frame.grid(row=currow_frame2(), column=0)
         Label(webdriver_frame, text='ALPHA模式 专属参数项').grid(row=0, column=0, columnspan=3, pady=5)
-        Label(webdriver_frame, text='* 默认浏览器类型').grid(row=1, column=0)
+        Label(webdriver_frame, text='* 浏览器驱动类型').grid(row=1, column=0)
         self.webdriver_type_value_str = StringVar()
         self.webdriver_type_value_str.set('Microsoft edge Chromium')
         self.webdriver_type_list = ['Microsoft edge Chromium', 'Microsoft edge Chromium 80 以下', 'Chrome', 'Firefox']
@@ -192,7 +192,7 @@ class MainWindow:
                                                     textvariable=self.webdriver_type_value_str,
                                                     values=self.webdriver_type_list)
         self.webdriver_type_combobox.grid(row=1, column=1)
-        Label(webdriver_frame, text='注: 驱动要与浏览器版本相对应').grid(row=2, column=0, columnspan=3)
+        Label(webdriver_frame, text='注: 驱动版本要与浏览器版本相对应 (也许可相差个别小版本。自测~)').grid(row=2, column=0, columnspan=3)
         Label(webdriver_frame, text='* 浏览器驱动地址').grid(row=3, column=0)
         self.webdriver_path_text = Text(webdriver_frame, height=3, width=30)
         self.webdriver_path_text.grid(row=3, column=1)
@@ -211,17 +211,17 @@ class MainWindow:
         Label(webdriver_frame, text='* 登录框id').grid(row=7, column=0)
         self.login_id_text = Text(webdriver_frame, height=1, width=30)
         self.login_id_text.grid(row=7, column=1)
-        Label(webdriver_frame, text='* 登录按钮点击方式').grid(row=8, column=0)
-        self.login_id_click_mode_value_str = StringVar()
-        self.login_id_click_mode_value_str.set('click')
-        self.login_id_click_mode_checkbutton_click = Checkbutton(webdriver_frame, text='方式一',
-                                                                 variable=self.login_id_click_mode_value_str,
-                                                                 onvalue='click')
-        self.login_id_click_mode_checkbutton_click.grid(row=8, column=1)
-        self.login_id_click_mode_checkbutton_submit = Checkbutton(webdriver_frame, text='方式二',
-                                                                  variable=self.login_id_click_mode_value_str,
-                                                                  onvalue='submit')
-        self.login_id_click_mode_checkbutton_submit.grid(row=9, column=1)
+        # Label(webdriver_frame, text='* 登录按钮点击方式').grid(row=8, column=0)
+        # self.login_id_click_mode_value_str = StringVar()
+        # self.login_id_click_mode_value_str.set('click')
+        # self.login_id_click_mode_checkbutton_click = Checkbutton(webdriver_frame, text='方式一',
+        #                                                          variable=self.login_id_click_mode_value_str,
+        #                                                          onvalue='click')
+        # self.login_id_click_mode_checkbutton_click.grid(row=8, column=1)
+        # self.login_id_click_mode_checkbutton_submit = Checkbutton(webdriver_frame, text='方式二',
+        #                                                           variable=self.login_id_click_mode_value_str,
+        #                                                           onvalue='submit')
+        # self.login_id_click_mode_checkbutton_submit.grid(row=9, column=1)
 
         # 立即登录
         Button(self.main_frame2, text="登录", command=self.login_wifi_main).grid(row=currow_frame2(), column=0)
@@ -251,7 +251,7 @@ class MainWindow:
         guard_service_frame.grid(row=currow_frame2(), column=0)
         self.guard_service_value_bool = BooleanVar()
         self.guard_service_value_bool.set(False)
-        self.guard_service_checkbutton = Checkbutton(guard_service_frame, text='守护进程',
+        self.guard_service_checkbutton = Checkbutton(guard_service_frame, text='守护进程 (若要操作计算机, 请勿开启)',
                                                      variable=self.guard_service_value_bool,
                                                      onvalue=True, offvalue=False)
         self.guard_service_checkbutton.grid(row=0, column=0)
@@ -402,7 +402,7 @@ class MainWindow:
                     self.webpath_text.get(0.0, END)[:-1], work_mode,
                     self.webdriver_type_combobox.get(), self.webdriver_path_text.get(0.0, END)[:-1],
                     self.account_id_text.get(0.0, END)[:-1], self.password_id_text.get(0.0, END)[:-1],
-                    self.login_id_text.get(0.0, END)[:-1], self.login_id_click_mode_value_str.get(),
+                    # self.login_id_text.get(0.0, END)[:-1], self.login_id_click_mode_value_str.get(),
                     self.auto_start_value_bool.get(), self.auto_close_window_value_bool.get(),
                     self.guard_service_value_bool.get()
                 )
@@ -578,8 +578,8 @@ class MainWindow:
                     MainWindow.set_value(self.login_id_text,
                                          self.alpha_object.alpha_object[custom_constant.login_id])
                     # 按钮点击类型
-                    MainWindow.set_value(self.login_id_click_mode_value_str,
-                                         self.alpha_object.alpha_object[custom_constant.button_click_mode])
+                    # MainWindow.set_value(self.login_id_click_mode_value_str,
+                    #                      self.alpha_object.alpha_object[custom_constant.button_click_mode])
                     # 基础功能
                     # 网址
                     MainWindow.set_value(self.webpath_text,

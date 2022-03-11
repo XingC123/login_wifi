@@ -183,44 +183,45 @@ class MainWindow:
         # 浏览器驱动
         webdriver_frame = Frame(self.main_frame2, bd=1, relief=GROOVE)
         webdriver_frame.grid(row=currow_frame2(), column=0)
-        Label(webdriver_frame, text='* 默认浏览器类型').grid(row=0, column=0)
+        Label(webdriver_frame, text='ALPHA模式 专属参数项').grid(row=0, column=0, columnspan=3, pady=5)
+        Label(webdriver_frame, text='* 默认浏览器类型').grid(row=1, column=0)
         self.webdriver_type_value_str = StringVar()
         self.webdriver_type_value_str.set('Microsoft edge Chromium')
         self.webdriver_type_list = ['Microsoft edge Chromium', 'Microsoft edge Chromium 80 以下', 'Chrome', 'Firefox']
         self.webdriver_type_combobox = ttk.Combobox(webdriver_frame, height=4, width=40, state='readonly',
                                                     textvariable=self.webdriver_type_value_str,
                                                     values=self.webdriver_type_list)
-        self.webdriver_type_combobox.grid(row=0, column=1)
-        Label(webdriver_frame, text='* 浏览器驱动地址').grid(row=1, column=0)
+        self.webdriver_type_combobox.grid(row=1, column=1)
+        Label(webdriver_frame, text='注: 驱动要与浏览器版本相对应').grid(row=2, column=0, columnspan=3)
+        Label(webdriver_frame, text='* 浏览器驱动地址').grid(row=3, column=0)
         self.webdriver_path_text = Text(webdriver_frame, height=3, width=30)
-        self.webdriver_path_text.grid(row=1, column=1)
+        self.webdriver_path_text.grid(row=3, column=1)
 
         def choose_file():
             MainWindow.choose_file(self.webdriver_path_text)
 
-        Button(webdriver_frame, text='打开', command=choose_file).grid(row=1, column=2)
-        Label(webdriver_frame, text='注: 以下id请自行从html源代码查找').grid(row=2, column=0, columnspan=4)
-        Label(webdriver_frame, text='* 账号框id').grid(row=3, column=0)
+        Button(webdriver_frame, text='打开', command=choose_file).grid(row=3, column=2)
+        Label(webdriver_frame, text='注: 以下id请自行从html源代码查找').grid(row=4, column=0, columnspan=4)
+        Label(webdriver_frame, text='* 账号框id').grid(row=5, column=0)
         self.account_id_text = Text(webdriver_frame, height=1, width=30)
-        self.account_id_text.grid(row=3, column=1)
-        Label(webdriver_frame, text='* 密码框id').grid(row=4, column=0)
+        self.account_id_text.grid(row=5, column=1)
+        Label(webdriver_frame, text='* 密码框id').grid(row=6, column=0)
         self.password_id_text = Text(webdriver_frame, height=1, width=30)
-        self.password_id_text.grid(row=4, column=1)
-        Label(webdriver_frame, text='* 登录框id').grid(row=5, column=0)
+        self.password_id_text.grid(row=6, column=1)
+        Label(webdriver_frame, text='* 登录框id').grid(row=7, column=0)
         self.login_id_text = Text(webdriver_frame, height=1, width=30)
-        self.login_id_text.grid(row=5, column=1)
-        Label(webdriver_frame, text='* 登录按钮点击方式').grid(row=6, column=0)
+        self.login_id_text.grid(row=7, column=1)
+        Label(webdriver_frame, text='* 登录按钮点击方式').grid(row=8, column=0)
         self.login_id_click_mode_value_str = StringVar()
         self.login_id_click_mode_value_str.set('click')
         self.login_id_click_mode_checkbutton_click = Checkbutton(webdriver_frame, text='方式一',
                                                                  variable=self.login_id_click_mode_value_str,
                                                                  onvalue='click')
-        self.login_id_click_mode_checkbutton_click.grid(row=6, column=1)
+        self.login_id_click_mode_checkbutton_click.grid(row=8, column=1)
         self.login_id_click_mode_checkbutton_submit = Checkbutton(webdriver_frame, text='方式二',
                                                                   variable=self.login_id_click_mode_value_str,
                                                                   onvalue='submit')
-        self.login_id_click_mode_checkbutton_submit.grid(row=7, column=1)
-        Label(webdriver_frame, text='注: 若选择 [运行模式] 为 [ALPHA模式], 则此为必须参数', width=50).grid(row=8, column=0, columnspan=2)
+        self.login_id_click_mode_checkbutton_submit.grid(row=9, column=1)
 
         # 立即登录
         Button(self.main_frame2, text="登录", command=self.login_wifi_main).grid(row=currow_frame2(), column=0)

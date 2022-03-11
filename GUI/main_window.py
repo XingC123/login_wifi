@@ -23,7 +23,7 @@ import GUI.app_info
 import GUI.get_xy_window as get_xy_window
 import GUI.custom_messagebox as custom_messagebox
 # func
-from func.login_webdriver import Login
+from func.login.login_webdriver import Login
 
 
 class MainWindow:

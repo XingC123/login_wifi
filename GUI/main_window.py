@@ -263,7 +263,7 @@ class MainWindow:
                 self.save_config()
             except Exception as ex:
                 print("__init__: save_config(): 出现如下异常: %s" % ex)
-                custom_messagebox.CustomMessagebox(self.root_window, '保存配置', 300, 200, ['保存失败', '参数不能为空'], True)
+                custom_messagebox.CustomMessagebox(self.root_window, '保存配置', 300, 200, ['保存失败, 参数不能为空'], True)
             else:
                 custom_messagebox.CustomMessagebox(self.root_window, '保存配置', 300, 200, ['保存成功'], True)
 
@@ -477,7 +477,7 @@ class MainWindow:
             self.load_config_main(mode)
         except Exception as ex:
             print("load_config(self, mode='normal'): 出现如下异常: %s" % ex)
-            custom_messagebox.CustomMessagebox(self.root_window, '加载配置', 300, 200, ['加载失败', '配置文件损坏, 所需参数丢失'], True)
+            custom_messagebox.CustomMessagebox(self.root_window, '加载配置', 300, 200, ['加载失败, 配置文件损坏, 所需参数丢失'], True)
         else:
             if mode == 'boot':
                 if self.auto_start_value_bool.get():

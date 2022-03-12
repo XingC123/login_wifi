@@ -224,7 +224,7 @@ class MainWindow:
         # self.login_id_click_mode_checkbutton_submit.grid(row=9, column=1)
 
         # 立即登录
-        Button(self.main_frame2, text="登录", command=self.login_wifi_main).grid(row=currow_frame2(), column=0)
+        Button(self.main_frame2, text="登录", command=self.login_wifi).grid(row=currow_frame2(), column=0)
 
         # 自动执行
         auto_start_frame = Frame(self.main_frame2)
@@ -278,27 +278,7 @@ class MainWindow:
 
         # 配置初始化
         def init_config():
-            event = threading.Event()
-
-            def stop_work():
-                if event.is_set() is False:
-                    stop_with_main_thread.stop_thread(execute_thread)
-
-            def check_finish():
-                event.wait()
-
-            def execute_work():
-                self.load_config('boot')
-                event.set()
-
-            def tip_window():
-                custom_messagebox.CustomMessagebox(self.root_window, '正在自动执行设定的任务', 400, 200, ['将在5s后执行'],
-                                                   True, check_finish, True, event, stop_work)
-
-            execute_thread = threading.Thread(target=execute_work)
-
-            threading.Thread(target=tip_window).start()
-            execute_thread.start()
+            self.load_config('boot')
 
         load_config_thread = threading.Thread(target=init_config)
         load_config_thread.daemon = True
@@ -413,8 +393,33 @@ class MainWindow:
         except:
             raise ValueError('generate_object(self): 生成对象失败')
 
-    def login_wifi(self):
-        self.login_wifi_main()
+    def login_wifi(self, mode='normal'):
+        def login():
+            if mode == 'boot':
+                time.sleep(5)
+            try:
+                self.login_wifi_main()
+            except Exception as e:
+                print('login_wifi(self): ', end='')
+                print(e)
+
+        def stop_work():
+            stop_with_main_thread.stop_thread(tip_thread)
+
+        def tip_window():
+            if mode == 'boot':
+                tip_title = '正在自动执行设定的任务'
+                tip = '将在5s后执行'
+            else:
+                tip_title = '执行任务'
+                tip = '正在执行...'
+
+            custom_messagebox.CustomMessagebox(self.root_window, tip_title, 400, 200, [tip],
+                                               True, login, True, stop_work)
+
+        tip_thread = threading.Thread(target=tip_window)
+        tip_thread.daemon = True
+        tip_thread.start()
 
         # 守护进程
         self.guard_service()
@@ -485,8 +490,8 @@ class MainWindow:
         else:
             if mode == 'boot':
                 if self.auto_start_value_bool.get():
-                    time.sleep(5)
-                    self.login_wifi()
+                    # time.sleep(5)
+                    self.login_wifi(mode)
             if not self.auto_start_value_bool.get():
                 # 如果不需要自动登录, 则显示加载结果
                 custom_messagebox.CustomMessagebox(self.root_window, '加载配置', 300, 200, ['加载成功'], True)

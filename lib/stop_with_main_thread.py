@@ -33,3 +33,5 @@ class StopWithMainThread:
         self.thread.start()
         if self.if_join:
             self.thread.join()
+        # 执行完任务返回
+        return True

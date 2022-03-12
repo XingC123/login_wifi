@@ -1,3 +1,4 @@
+import time
 from tkinter import *
 
 import environment.custom_constant.custom_constant
@@ -67,7 +68,12 @@ class CustomMessagebox:
         def custom_func():
             # 执行传入构造函数的方法
             if self.func is not None:
-                self.custom_func_thread.run()
+                result = self.custom_func_thread.run()
+                while True:
+                    if result:
+                        break
+                    else:
+                        time.sleep(2)
                 if auto_close and self.if_closed is False:
                     # 若窗口设置 auto_close = True ,正常情况下,线程执行成功会自动关闭,即无需执行停止线程操作,传参 False
                     self.close(False)

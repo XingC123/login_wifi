@@ -31,7 +31,7 @@ class Login:
         # hook的登录元素数组
         self.element_list = [self.account_id, self.pwd_id, self.login_id]
         # 按钮点击方式
-        self.button_click_mode = self.Alpha_object[custom_constant.button_click_mode]
+        # self.button_click_mode = self.Alpha_object[custom_constant.button_click_mode]
 
         # 初始化
         self.init_webdriver(self.driver_path)

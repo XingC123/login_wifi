@@ -211,17 +211,7 @@ class MainWindow:
         Label(webdriver_frame, text='* 登录框id').grid(row=7, column=0)
         self.login_id_text = Text(webdriver_frame, height=1, width=30)
         self.login_id_text.grid(row=7, column=1)
-        # Label(webdriver_frame, text='* 登录按钮点击方式').grid(row=8, column=0)
-        # self.login_id_click_mode_value_str = StringVar()
-        # self.login_id_click_mode_value_str.set('click')
-        # self.login_id_click_mode_checkbutton_click = Checkbutton(webdriver_frame, text='方式一',
-        #                                                          variable=self.login_id_click_mode_value_str,
-        #                                                          onvalue='click')
-        # self.login_id_click_mode_checkbutton_click.grid(row=8, column=1)
-        # self.login_id_click_mode_checkbutton_submit = Checkbutton(webdriver_frame, text='方式二',
-        #                                                           variable=self.login_id_click_mode_value_str,
-        #                                                           onvalue='submit')
-        # self.login_id_click_mode_checkbutton_submit.grid(row=9, column=1)
+        Label(webdriver_frame, text='注: FireFox无防御脚本, 你可能会被网站检测从而无法登录').grid(row=8, column=0, columnspan=4)
 
         # 立即登录
         Button(self.main_frame2, text="登录", command=self.login_wifi).grid(row=currow_frame2(), column=0)
@@ -255,6 +245,7 @@ class MainWindow:
                                                      variable=self.guard_service_value_bool,
                                                      onvalue=True, offvalue=False)
         self.guard_service_checkbutton.grid(row=0, column=0)
+        Label(guard_service_frame, text='(关闭主程序才能关闭守护进程)').grid(row=1, column=0)
         # 保存配置
         config_button_frame = Frame(self.main_frame2)
         config_button_frame.grid(row=currow_frame2(), column=0)
@@ -385,11 +376,9 @@ class MainWindow:
                     self.webdriver_type_combobox.get(), self.webdriver_path_text.get(0.0, END)[:-1],
                     self.account_id_text.get(0.0, END)[:-1], self.password_id_text.get(0.0, END)[:-1],
                     self.login_id_text.get(0.0, END)[:-1],
-                    # self.login_id_click_mode_value_str.get(),
                     self.auto_start_value_bool.get(), self.auto_close_window_value_bool.get(),
                     self.guard_service_value_bool.get()
                 )
-                print(self.alpha_object.alpha_object[custom_constant.func_object])
         except:
             raise ValueError('generate_object(self): 生成对象失败')
 
@@ -585,9 +574,6 @@ class MainWindow:
                     # 登录按钮id
                     MainWindow.set_value(self.login_id_text,
                                          self.alpha_object.alpha_object[custom_constant.login_id])
-                    # 按钮点击类型
-                    # MainWindow.set_value(self.login_id_click_mode_value_str,
-                    #                      self.alpha_object.alpha_object[custom_constant.button_click_mode])
                     # 基础功能
                     # 网址
                     MainWindow.set_value(self.webpath_text,

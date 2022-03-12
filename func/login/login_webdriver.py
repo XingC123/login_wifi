@@ -123,6 +123,7 @@ class Login:
 
     def run(self):
         # 执行login
+        time.sleep(3)  # 也许过快会造成打开浏览器地址栏只有"data:,"的bug
         self.open_url(self.url)
         # hook目标元素
         for i in self.element_list:

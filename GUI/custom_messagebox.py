@@ -4,6 +4,7 @@ from tkinter import *
 import environment.custom_constant.custom_constant
 import lib.necessary_lib as necessary_lib
 import lib.stop_with_main_thread as stop_with_main_thread
+from lib.global_variables import GlobalVariable
 
 
 class CustomMessagebox:
@@ -27,10 +28,11 @@ class CustomMessagebox:
         self.if_disable_parent = if_disable_parent
         if self.if_disable_parent:
             self.parent_window.attributes('-disable', True)
+            GlobalVariable.cur_msg_windows_count += 1
         # 主窗口
         self.msg_window = Toplevel(self.parent_window)
         # self.msg_window.attributes("-toolwindow", 1) # 只有 关闭 按钮(只在win生效)
-        self.msg_window.wm_attributes("-topmost", 1)  # 窗口永远在顶层
+        # self.msg_window.wm_attributes("-topmost", 1)  # 窗口永远在顶层
         geometry = necessary_lib.middle_screen(self.msg_window, width, height)
         # 窗口属性
         necessary_lib.fit_screen_zoom(self.msg_window)
@@ -95,5 +97,7 @@ class CustomMessagebox:
         if self.stop_func is not None:
             self.stop_func()
         if self.if_disable_parent:
-            self.parent_window.attributes('-disable', False)
+            if GlobalVariable.cur_msg_windows_count == 1:
+                self.parent_window.attributes('-disable', False)
+        GlobalVariable.cur_msg_windows_count -= 1
         self.msg_window.destroy()

@@ -78,14 +78,16 @@ class AlphaLoginObject:
         self.set_alpha_object(mode='init')
 
     def set_alpha_object(self, account='', pwd='', webpath='', work_mode='2', webdriver_type='', webdriver_path='',
-                         account_id='', pwd_id='', login_id='', button_click_mode='click',
+                         account_id='', pwd_id='', login_id='',
+                         # button_click_mode='click',
                          autostart=False, autoclose=False, guard_service=False,
                          mode='normal'):
         def if_allow_set_object():
             if webpath != '':
                 if str2int(work_mode) == 2 and \
                         account != '' and pwd != '' and webdriver_path != '' and webdriver_type != '' and \
-                        account_id != '' and pwd_id != '' and login_id != '' and button_click_mode != '':
+                        account_id != '' and pwd_id != '' and login_id != '':
+                        # and button_click_mode != '':
                     return True
             raise ValueError("ALPHA: if_allow_set_object(): 参数不全")
 
@@ -96,7 +98,7 @@ class AlphaLoginObject:
                                  custom_constant.webdriver_type: webdriver_type,
                                  custom_constant.account_id: account_id, custom_constant.pwd_id: pwd_id,
                                  custom_constant.login_id: login_id,
-                                 custom_constant.button_click_mode: button_click_mode,
+                                 # custom_constant.button_click_mode: button_click_mode,
                                  custom_constant.func_object: self.func_object.func_object
                                  }
 

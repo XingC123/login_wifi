@@ -404,7 +404,8 @@ class MainWindow:
                     self.webpath_text.get(0.0, END)[:-1], work_mode,
                     self.webdriver_type_combobox.get(), self.webdriver_path_text.get(0.0, END)[:-1],
                     self.account_id_text.get(0.0, END)[:-1], self.password_id_text.get(0.0, END)[:-1],
-                    # self.login_id_text.get(0.0, END)[:-1], self.login_id_click_mode_value_str.get(),
+                    self.login_id_text.get(0.0, END)[:-1],
+                    # self.login_id_click_mode_value_str.get(),
                     self.auto_start_value_bool.get(), self.auto_close_window_value_bool.get(),
                     self.guard_service_value_bool.get()
                 )

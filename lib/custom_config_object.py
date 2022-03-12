@@ -13,11 +13,13 @@ class FunctionObject:
     def __init__(self):
         self.func_object = None
 
-    def init_func_object(self, webpath='', work_mode='', autostart=False, autoclose=False, guard_service=False):
+    def init_func_object(self, webpath='', work_mode='', autostart=False, autoclose=False, guard_service=False,
+                         login_visualization=True):
         self.func_object = {custom_constant.webpath: webpath,
                             custom_constant.work_mode: work_mode,
                             custom_constant.autoStart: autostart, custom_constant.autoClose: autoclose,
-                            custom_constant.guard_service: guard_service
+                            custom_constant.guard_service: guard_service,
+                            custom_constant.login_visualization: login_visualization
                             }
 
 
@@ -80,6 +82,7 @@ class AlphaLoginObject:
     def set_alpha_object(self, account='', pwd='', webpath='', work_mode='2', webdriver_type='', webdriver_path='',
                          account_id='', pwd_id='', login_id='',
                          autostart=False, autoclose=False, guard_service=False,
+                         login_visualization=True,  # 登录过程可视化
                          mode='normal'):
         def if_allow_set_object():
             if webpath != '':
@@ -90,7 +93,8 @@ class AlphaLoginObject:
             raise ValueError("ALPHA: if_allow_set_object(): 参数不全")
 
         if mode == 'init' or if_allow_set_object():
-            self.func_object.init_func_object(webpath, work_mode, autostart, autoclose, guard_service)
+            self.func_object.init_func_object(webpath, work_mode, autostart, autoclose, guard_service,
+                                              login_visualization)
             self.alpha_object = {custom_constant.account: account, custom_constant.password: pwd,
                                  custom_constant.webdriver_path: webdriver_path,
                                  custom_constant.webdriver_type: webdriver_type,

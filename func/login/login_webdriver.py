@@ -30,6 +30,8 @@ class Login:
         self.driver = None
         # hook的登录元素数组
         self.element_list = [self.account_id, self.pwd_id, self.login_id]
+        # 登录过程可视化
+        self.login_visualization = self.Alpha_object[custom_constant.func_object][custom_constant.login_visualization]
 
         # 初始化
         self.init_webdriver(self.driver_path)
@@ -53,6 +55,11 @@ class Login:
             # 修改window.navigator.webdriver，防机器人识别机制，selenium自动登陆判别机制
             # CDP执行JavaScript 代码  重定义windows.navigator.webdriver的值
             driver_options.add_experimental_option('excludeSwitches', ['enable-automation', 'enable-logging'])
+            # 登录过程可视化
+            if not self.login_visualization:
+                # 不可视化
+                driver_options.add_argument('--disable-gpu')  # 谷歌文档说以此来规避bug
+                driver_options.add_argument('--headless')  # 浏览器不提供可视化界面。Linux下如果系统不支持可视化不加这条会启动失败
 
             if self.Alpha_object[custom_constant.webdriver_type] == 'Microsoft edge Chromium 80 以下' or \
                     self.Alpha_object[custom_constant.webdriver_type] == 'Chrome':
@@ -116,15 +123,16 @@ class Login:
                 #     element.click()
                 js = 'document.getElementById("' + id_str + '").click()'
                 self.driver.execute_script(js)
-                # 等待5s, 防止过快响应导致login不成功
-                time.sleep(5)
-
-                self.driver.close()
 
     def run(self):
         # 执行login
-        time.sleep(3)  # 也许过快会造成打开浏览器地址栏只有"data:,"的bug
+        # time.sleep(3)  # 也许过快会造成打开浏览器地址栏只有"data:,"的bug
         self.open_url(self.url)
         # hook目标元素
         for i in self.element_list:
             self.work_after_loaded(i)
+
+        # 等待5s, 防止过快响应导致login不成功
+        time.sleep(5)
+
+        self.driver.close()

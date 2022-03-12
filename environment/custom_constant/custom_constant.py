@@ -50,6 +50,7 @@ func_object = 'func_object'
 # 22.3.9
 normal_object = 'normal_object'
 alpha_object = 'alpha_object'
+login_visualization = 'login_visualization'
 
 
 # 字体

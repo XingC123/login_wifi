@@ -184,34 +184,46 @@ class MainWindow:
         webdriver_frame = Frame(self.main_frame2, bd=1, relief=GROOVE)
         webdriver_frame.grid(row=currow_frame2(), column=0)
         Label(webdriver_frame, text='ALPHA模式 专属参数项').grid(row=0, column=0, columnspan=3, pady=5)
-        Label(webdriver_frame, text='* 浏览器驱动类型').grid(row=1, column=0)
+        Label(webdriver_frame, text='注: FireFox无防御脚本, 你可能会被网站检测从而无法登录').grid(row=1, column=0, columnspan=4)
+        Label(webdriver_frame, text='* 浏览器驱动类型').grid(row=2, column=0)
         self.webdriver_type_value_str = StringVar()
         self.webdriver_type_value_str.set('Microsoft edge Chromium')
         self.webdriver_type_list = ['Microsoft edge Chromium', 'Microsoft edge Chromium 80 以下', 'Chrome', 'Firefox']
         self.webdriver_type_combobox = ttk.Combobox(webdriver_frame, height=4, width=40, state='readonly',
                                                     textvariable=self.webdriver_type_value_str,
                                                     values=self.webdriver_type_list)
-        self.webdriver_type_combobox.grid(row=1, column=1)
-        Label(webdriver_frame, text='注: 驱动版本要与浏览器版本相对应 (也许可相差个别小版本。自测~)').grid(row=2, column=0, columnspan=3)
-        Label(webdriver_frame, text='* 浏览器驱动地址').grid(row=3, column=0)
+        self.webdriver_type_combobox.grid(row=2, column=1)
+        Label(webdriver_frame, text='注: 驱动版本要与浏览器版本相对应 (也许可相差个别小版本。自测~)').grid(row=3, column=0, columnspan=3)
+        Label(webdriver_frame, text='* 浏览器驱动地址').grid(row=4, column=0)
         self.webdriver_path_text = Text(webdriver_frame, height=3, width=30)
-        self.webdriver_path_text.grid(row=3, column=1)
+        self.webdriver_path_text.grid(row=4, column=1)
 
         def choose_file():
             MainWindow.choose_file(self.webdriver_path_text)
 
-        Button(webdriver_frame, text='打开', command=choose_file).grid(row=3, column=2)
-        Label(webdriver_frame, text='注: 以下id请自行从html源代码查找').grid(row=4, column=0, columnspan=4)
-        Label(webdriver_frame, text='* 账号框id').grid(row=5, column=0)
+        Button(webdriver_frame, text='打开', command=choose_file).grid(row=4, column=2)
+        Label(webdriver_frame, text='注: 以下id请自行从html源代码查找').grid(row=5, column=0, columnspan=4)
+        Label(webdriver_frame, text='* 账号框id').grid(row=6, column=0)
         self.account_id_text = Text(webdriver_frame, height=1, width=30)
-        self.account_id_text.grid(row=5, column=1)
-        Label(webdriver_frame, text='* 密码框id').grid(row=6, column=0)
+        self.account_id_text.grid(row=6, column=1)
+        Label(webdriver_frame, text='* 密码框id').grid(row=7, column=0)
         self.password_id_text = Text(webdriver_frame, height=1, width=30)
-        self.password_id_text.grid(row=6, column=1)
-        Label(webdriver_frame, text='* 登录框id').grid(row=7, column=0)
+        self.password_id_text.grid(row=7, column=1)
+        Label(webdriver_frame, text='* 登录框id').grid(row=8, column=0)
         self.login_id_text = Text(webdriver_frame, height=1, width=30)
-        self.login_id_text.grid(row=7, column=1)
-        Label(webdriver_frame, text='注: FireFox无防御脚本, 你可能会被网站检测从而无法登录').grid(row=8, column=0, columnspan=4)
+        self.login_id_text.grid(row=8, column=1)
+        # 登录过程可视化
+        self.login_visualization_value_bool = BooleanVar()
+        Label(webdriver_frame, text='* 登录过程可视化').grid(row=9, column=0)
+        self.login_visualization_value_bool.set(True)
+        self.login_visualization_true_checkbutton = Checkbutton(webdriver_frame, text='可视化',
+                                                                variable=self.login_visualization_value_bool,
+                                                                onvalue=True)
+        self.login_visualization_true_checkbutton.grid(row=9, column=1)
+        self.login_visualization_false_checkbutton = Checkbutton(webdriver_frame, text='不可视化',
+                                                                 variable=self.login_visualization_value_bool,
+                                                                 onvalue=False)
+        self.login_visualization_false_checkbutton.grid(row=10, column=1)
 
         # 立即登录
         Button(self.main_frame2, text="登录", command=self.login_wifi).grid(row=currow_frame2(), column=0)
@@ -245,7 +257,7 @@ class MainWindow:
                                                      variable=self.guard_service_value_bool,
                                                      onvalue=True, offvalue=False)
         self.guard_service_checkbutton.grid(row=0, column=0)
-        Label(guard_service_frame, text='(关闭主程序才能关闭守护进程)').grid(row=1, column=0)
+        Label(guard_service_frame, text='(选择"登录过程不可视化也许可以进行守护")(关闭主程序才能关闭守护进程)').grid(row=1, column=0)
         # 保存配置
         config_button_frame = Frame(self.main_frame2)
         config_button_frame.grid(row=currow_frame2(), column=0)
@@ -377,7 +389,8 @@ class MainWindow:
                     self.account_id_text.get(0.0, END)[:-1], self.password_id_text.get(0.0, END)[:-1],
                     self.login_id_text.get(0.0, END)[:-1],
                     self.auto_start_value_bool.get(), self.auto_close_window_value_bool.get(),
-                    self.guard_service_value_bool.get()
+                    self.guard_service_value_bool.get(),
+                    self.login_visualization_value_bool.get()
                 )
         except:
             raise ValueError('generate_object(self): 生成对象失败')
@@ -594,6 +607,11 @@ class MainWindow:
                     MainWindow.set_value(self.guard_service_value_bool,
                                          self.alpha_object.alpha_object[custom_constant.func_object][
                                              custom_constant.guard_service])
+                    # 登录过程可视化
+                    MainWindow.set_value(self.login_visualization_value_bool,
+                                         self.alpha_object.alpha_object[custom_constant.func_object][
+                                             custom_constant.login_visualization
+                                         ])
                 else:
                     raise ValueError('load_config_main(self, mode): 配置损坏')
 

@@ -127,12 +127,17 @@ class Login:
     def run(self):
         # 执行login
         # time.sleep(3)  # 也许过快会造成打开浏览器地址栏只有"data:,"的bug
-        self.open_url(self.url)
-        # hook目标元素
-        for i in self.element_list:
-            self.work_after_loaded(i)
+        try:
+            self.open_url(self.url)
+        except Exception as e:
+            print('登录run()')
+            print(e)
+        else:
+            # hook目标元素
+            for i in self.element_list:
+                self.work_after_loaded(i)
 
-        # 等待5s, 防止过快响应导致login不成功
-        time.sleep(5)
-
-        self.driver.close()
+            # 等待5s, 防止过快响应导致login不成功
+            time.sleep(5)
+        finally:
+            self.driver.close()

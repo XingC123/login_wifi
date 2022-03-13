@@ -364,6 +364,7 @@ class MainWindow:
             self.auto_close_window_after_connected_checkbutton['state'] = NORMAL
         else:
             self.auto_close_window_after_connected_checkbutton['state'] = DISABLED
+            self.auto_close_window_after_connected_value_bool.set(False)
 
     def load_element_by_mode(self):
         work_mode = self.work_mode_value_int.get()

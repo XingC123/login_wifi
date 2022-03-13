@@ -246,16 +246,8 @@ class MainWindow:
 
         self.auto_close_window_checkbutton = Checkbutton(auto_close_window_frame, text="自动关闭窗口",
                                                          variable=self.auto_close_window_value_bool,
-                                                         onvalue=True, offvalue=False,
-                                                         command=self.manage_auto_close)
+                                                         onvalue=True, offvalue=False)
         self.auto_close_window_checkbutton.grid(row=0, column=0)
-        # 无论如何都关闭窗口
-        self.force_auto_close_window_value_bool = BooleanVar()
-        self.force_auto_close_window_value_bool.set(False)
-        self.force_auto_close_window_checkbutton = Checkbutton(auto_close_window_frame, text='强制关闭',
-                                                               variable=self.force_auto_close_window_value_bool,
-                                                               onvalue=True, offvalue=False)
-        self.force_auto_close_window_checkbutton.grid(row=0, column=1)
 
         # 守护进程
         guard_service_frame = Frame(self.main_frame2)
@@ -335,7 +327,6 @@ class MainWindow:
         # 根据工作模式初始化其他部件
         self.load_element_by_mode()
         # 初始化其他控件
-        self.manage_auto_close()
 
     def load_element_by_mode(self):
         work_mode = self.work_mode_value_int.get()
@@ -368,13 +359,6 @@ class MainWindow:
                                                ['ALPHA模式 目前尚不完善, 在执行 login 后会自动结束任务而不会返回任何结果。请确保你的账号以及密码正确无误!'],
                                                True)
 
-    def manage_auto_close(self):
-        # 管理"强制关闭窗口"控件
-        if self.auto_close_window_value_bool.get():
-            self.force_auto_close_window_checkbutton['state'] = NORMAL
-        else:
-            self.force_auto_close_window_checkbutton['state'] = DISABLED
-
     # 其他方法
     def get_cur_work_mode(self):
         # 返回当前工作模式
@@ -397,8 +381,7 @@ class MainWindow:
                     self.login_x_text.get(0.0, END)[:-1], self.login_y_text.get(0.0, END)[:-1],
                     self.brower_name_text.get(0.0, END)[:-1], self.webpath_text.get(0.0, END)[:-1], work_mode,
                     self.auto_start_value_bool.get(), self.auto_close_window_value_bool.get(),
-                    self.guard_service_value_bool.get(),
-                    self.force_auto_close_window_value_bool.get()
+                    self.guard_service_value_bool.get()
                 )
             elif work_mode == 2:
                 if self.normal_object is not None:
@@ -414,8 +397,7 @@ class MainWindow:
                     self.login_id_text.get(0.0, END)[:-1],
                     self.auto_start_value_bool.get(), self.auto_close_window_value_bool.get(),
                     self.guard_service_value_bool.get(),
-                    self.login_visualization_value_bool.get(),
-                    self.force_auto_close_window_value_bool.get()
+                    self.login_visualization_value_bool.get()
                 )
         except:
             raise ValueError('generate_object(self): 生成对象失败')
@@ -499,12 +481,7 @@ class MainWindow:
 
             # 自动关闭窗口
             if self.auto_close_window_value_bool.get():
-                if venusTools.check_internet():
-                    self.close_root_window()
-                else:
-                    if not self.force_auto_close_window_value_bool.get():
-                        custom_messagebox.CustomMessagebox(self.root_window, '自动关闭窗口', 300, 200,
-                                                           ['未成功联网, 不予关闭窗口'], True)
+                self.close_root_window()
 
             self.login_work_state = False
         else:
@@ -578,11 +555,6 @@ class MainWindow:
                     MainWindow.set_value(self.auto_close_window_value_bool,
                                          self.normal_object.normal_object[custom_constant.func_object][
                                              custom_constant.autoClose])
-                    # 强制关闭
-                    MainWindow.set_value(self.force_auto_close_window_value_bool,
-                                         self.normal_object.normal_object[custom_constant.func_object][
-                                             custom_constant.force_auto_close_window
-                                         ])
                     # 自动执行
                     MainWindow.set_value(self.auto_start_value_bool,
                                          self.normal_object.normal_object[custom_constant.func_object][
@@ -634,11 +606,6 @@ class MainWindow:
                     MainWindow.set_value(self.auto_close_window_value_bool,
                                          self.alpha_object.alpha_object[custom_constant.func_object][
                                              custom_constant.autoClose])
-                    # 强制关闭
-                    MainWindow.set_value(self.force_auto_close_window_value_bool,
-                                         self.alpha_object.alpha_object[custom_constant.func_object][
-                                             custom_constant.force_auto_close_window
-                                         ])
                     # 自动执行
                     MainWindow.set_value(self.auto_start_value_bool,
                                          self.alpha_object.alpha_object[custom_constant.func_object][

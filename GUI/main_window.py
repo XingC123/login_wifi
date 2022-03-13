@@ -297,6 +297,7 @@ class MainWindow:
         load_config_thread.start()
 
         self.root_window.config(menu=self.menubar)
+        self.root_window.protocol('WM_DELETE_WINDOW', lambda: self.close_root_window())
         self.root_window.mainloop()
 
     # 方法
@@ -499,9 +500,9 @@ class MainWindow:
             # 自动关闭窗口
             if self.auto_close_window_value_bool.get():
                 if venusTools.check_internet():
-                    self.root_window.destroy()
+                    self.close_root_window()
                 else:
-                    if self.force_auto_close_window_value_bool:
+                    if not self.force_auto_close_window_value_bool.get():
                         custom_messagebox.CustomMessagebox(self.root_window, '自动关闭窗口', 300, 200,
                                                            ['未成功联网, 不予关闭窗口'], True)
 
@@ -696,6 +697,14 @@ class MainWindow:
             guard_service_thread = threading.Thread(target=guard_service)
             guard_service_thread.daemon = True
             guard_service_thread.start()
+
+    # 自定义窗口关闭方法
+    def close_root_window(self):
+        curthread_list = threading.enumerate()
+        for i in curthread_list:
+            if str(i).find('stop') == -1:
+                stop_with_main_thread.stop_thread(i)
+        self.root_window.destroy()
 
     @classmethod
     def choose_file(cls, element):

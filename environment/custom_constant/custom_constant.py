@@ -52,6 +52,7 @@ normal_object = 'normal_object'
 alpha_object = 'alpha_object'
 login_visualization = 'login_visualization'
 force_auto_close_window = 'force_auto_close_window'
+auto_close_window_after_connected = 'auto_close_window_after_connected'
 
 
 # 字体

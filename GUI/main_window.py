@@ -255,8 +255,18 @@ class MainWindow:
 
         self.auto_close_window_checkbutton = Checkbutton(auto_close_window_frame, text="自动关闭窗口",
                                                          variable=self.auto_close_window_value_bool,
-                                                         onvalue=True, offvalue=False)
+                                                         onvalue=True, offvalue=False,
+                                                         command=self.check_auto_close_after_connected)
         self.auto_close_window_checkbutton.grid(row=0, column=0)
+        # 连上网络后自动关闭软件
+        self.auto_close_window_after_connected_value_bool = BooleanVar()
+        self.auto_close_window_after_connected_value_bool.set(False)
+        self.auto_close_window_after_connected_checkbutton = Checkbutton(
+            auto_close_window_frame, text='网络连接后自动关闭',
+            variable=self.auto_close_window_after_connected_value_bool,
+            onvalue=True, offvalue=False,
+            command=self.check_auto_close_after_connected)
+        self.auto_close_window_after_connected_checkbutton.grid(row=0, column=1)
 
         # 守护进程
         guard_service_frame = Frame(self.main_frame2)
@@ -265,7 +275,8 @@ class MainWindow:
         self.guard_service_value_bool.set(False)
         self.guard_service_checkbutton = Checkbutton(guard_service_frame, text='守护进程 (若要操作计算机, 请勿开启。但登录不可视化也许不影响)',
                                                      variable=self.guard_service_value_bool,
-                                                     onvalue=True, offvalue=False)
+                                                     onvalue=True, offvalue=False,
+                                                     command=self.check_auto_close_after_connected)
         self.guard_service_checkbutton.grid(row=0, column=0)
         Label(guard_service_frame, text='(选择"登录过程不可视化也许可以进行守护")').grid(row=1, column=0)
         # 保存配置
@@ -336,7 +347,8 @@ class MainWindow:
         # 根据工作模式初始化其他部件
         self.load_element_by_mode()
         # 刷新其他控件
-        self.refresh_guard_service_state()
+        self.refresh_guard_service_state()  # 刷新守护进程控件
+        self.check_auto_close_after_connected()  # 刷新网络连接后自动关闭控件
 
     def refresh_guard_service_state(self):
         # 刷新守护进程状态
@@ -344,6 +356,13 @@ class MainWindow:
             self.guard_service_state_label.config(text='× 未启用')
         else:
             self.guard_service_state_label.config(text='√ 已启用')
+
+    def check_auto_close_after_connected(self):
+        # 检查并设置"网络连接后自动关闭"控件的状态
+        if self.auto_close_window_value_bool.get() and self.guard_service_value_bool.get():
+            self.auto_close_window_after_connected_checkbutton['state'] = NORMAL
+        else:
+            self.auto_close_window_after_connected_checkbutton['state'] = DISABLED
 
     def load_element_by_mode(self):
         work_mode = self.work_mode_value_int.get()
@@ -398,7 +417,7 @@ class MainWindow:
                     self.login_x_text.get(0.0, END)[:-1], self.login_y_text.get(0.0, END)[:-1],
                     self.brower_name_text.get(0.0, END)[:-1], self.webpath_text.get(0.0, END)[:-1], work_mode,
                     self.auto_start_value_bool.get(), self.auto_close_window_value_bool.get(),
-                    self.guard_service_value_bool.get()
+                    self.guard_service_value_bool.get(), self.auto_close_window_after_connected_value_bool.get()
                 )
             elif work_mode == 2:
                 if self.normal_object is not None:
@@ -414,7 +433,7 @@ class MainWindow:
                     self.login_id_text.get(0.0, END)[:-1],
                     self.auto_start_value_bool.get(), self.auto_close_window_value_bool.get(),
                     self.guard_service_value_bool.get(),
-                    self.login_visualization_value_bool.get()
+                    self.login_visualization_value_bool.get(), self.auto_close_window_after_connected_value_bool.get()
                 )
         except:
             raise ValueError('generate_object(self): 生成对象失败')
@@ -499,7 +518,7 @@ class MainWindow:
                 Login(self.alpha_object.alpha_object, self.work_path).run()
 
             # 自动关闭窗口
-            if self.auto_close_window_value_bool.get():
+            if self.auto_close_window_value_bool.get() and not self.auto_close_window_after_connected_value_bool.get():
                 self.close_root_window()
 
             self.login_work_state = False
@@ -574,6 +593,11 @@ class MainWindow:
                     MainWindow.set_value(self.auto_close_window_value_bool,
                                          self.normal_object.normal_object[custom_constant.func_object][
                                              custom_constant.autoClose])
+                    # 网络连接后自动关闭
+                    MainWindow.set_value(self.auto_close_window_after_connected_value_bool,
+                                         self.normal_object.normal_object[custom_constant.func_object][
+                                             custom_constant.auto_close_window_after_connected
+                                         ])
                     # 自动执行
                     MainWindow.set_value(self.auto_start_value_bool,
                                          self.normal_object.normal_object[custom_constant.func_object][
@@ -625,6 +649,11 @@ class MainWindow:
                     MainWindow.set_value(self.auto_close_window_value_bool,
                                          self.alpha_object.alpha_object[custom_constant.func_object][
                                              custom_constant.autoClose])
+                    # 网络连接后自动关闭
+                    MainWindow.set_value(self.auto_close_window_after_connected_value_bool,
+                                         self.alpha_object.alpha_object[custom_constant.func_object][
+                                             custom_constant.auto_close_window_after_connected
+                                         ])
                     # 自动执行
                     MainWindow.set_value(self.auto_start_value_bool,
                                          self.alpha_object.alpha_object[custom_constant.func_object][
@@ -672,11 +701,16 @@ class MainWindow:
     # 守护进程
     def guard_service(self):
         if self.guard_service_value_bool.get():
+            internet_state = venusTools.check_internet()
+
             # 若启用守护进程
             def guard_service():
                 while True:
-                    if not venusTools.check_internet() and not self.login_work_state:
+                    if not internet_state and not self.login_work_state:
                         self.login_wifi_main()
+                    if internet_state and self.auto_close_window_value_bool.get() and \
+                            self.auto_close_window_after_connected_value_bool.get():
+                        self.close_root_window()
                     # 每隔一段时间检测一次
                     time.sleep(30)
 

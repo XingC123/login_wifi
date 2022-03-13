@@ -721,6 +721,7 @@ class MainWindow:
             self.guard_service_thread = threading.Thread(target=guard_service)
             self.guard_service_thread.daemon = True
             self.guard_service_thread.start()
+            self.refresh_guard_service_state()
 
     def stop_guard_service(self, mode='normal'):
         # 停止守护进程

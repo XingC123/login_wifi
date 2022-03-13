@@ -12,7 +12,7 @@ def info_app_info_menu(window):
     '''
     # 2.1.14 (4) -> 2.1.19 (5)
     # 2.1.19 (5) rename to 2.2 (5)
-    version = '版本: 2.2 (5)'
+    version = '版本: 2.2.2 (6)'
     msg_list = ['软件名: 自动登录', version, '日期: 22.3.13', '作者: XingC',
                 'github: https://github.com/XingC123/login_wifi',
                 '声明: 仅做学习交流之用,因其他用法造成的一切问题本人概不负责']

@@ -267,7 +267,7 @@ class MainWindow:
                                                      variable=self.guard_service_value_bool,
                                                      onvalue=True, offvalue=False)
         self.guard_service_checkbutton.grid(row=0, column=0)
-        Label(guard_service_frame, text='(选择"登录过程不可视化也许可以进行守护")(关闭主程序才能关闭守护进程)').grid(row=1, column=0)
+        Label(guard_service_frame, text='(选择"登录过程不可视化也许可以进行守护")').grid(row=1, column=0)
         # 保存配置
         config_button_frame = Frame(self.main_frame2)
         config_button_frame.grid(row=currow_frame2(), column=0)

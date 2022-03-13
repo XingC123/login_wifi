@@ -51,6 +51,7 @@ func_object = 'func_object'
 normal_object = 'normal_object'
 alpha_object = 'alpha_object'
 login_visualization = 'login_visualization'
+force_auto_close_window = 'force_auto_close_window'
 
 
 # 字体

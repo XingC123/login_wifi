@@ -14,12 +14,13 @@ class FunctionObject:
         self.func_object = None
 
     def init_func_object(self, webpath='', work_mode='', autostart=False, autoclose=False, guard_service=False,
-                         login_visualization=True):
+                         login_visualization=True, force_auto_close_window=False):
         self.func_object = {custom_constant.webpath: webpath,
                             custom_constant.work_mode: work_mode,
                             custom_constant.autoStart: autostart, custom_constant.autoClose: autoclose,
                             custom_constant.guard_service: guard_service,
-                            custom_constant.login_visualization: login_visualization
+                            custom_constant.login_visualization: login_visualization,
+                            custom_constant.force_auto_close_window: force_auto_close_window
                             }
 
 
@@ -37,6 +38,7 @@ class NormalLoginObject:
                           loginx='', loginy='',
                           brower_name='', webpath='', work_mode='1',
                           autostart=False, autoclose=False, guard_service=False,
+                          force_auto_close_window=False,
                           mode='normal', ):
         def if_allow_set_object():
             if webpath != '':
@@ -47,7 +49,8 @@ class NormalLoginObject:
             raise ValueError("Normal: if_allow_set_object(): 参数不全")
 
         if mode == 'init' or if_allow_set_object():
-            self.func_object.init_func_object(webpath, work_mode, autostart, autoclose, guard_service)
+            self.func_object.init_func_object(webpath, work_mode, autostart, autoclose, guard_service,
+                                              force_auto_close_window)
             self.normal_object = {custom_constant.account: account,
                                   custom_constant.account_x: ax, custom_constant.account_y: ay,
                                   custom_constant.password: pwd, custom_constant.password_x: pwdx,
@@ -83,6 +86,7 @@ class AlphaLoginObject:
                          account_id='', pwd_id='', login_id='',
                          autostart=False, autoclose=False, guard_service=False,
                          login_visualization=True,  # 登录过程可视化
+                         force_auto_close_window=False,
                          mode='normal'):
         def if_allow_set_object():
             if webpath != '':
@@ -94,7 +98,7 @@ class AlphaLoginObject:
 
         if mode == 'init' or if_allow_set_object():
             self.func_object.init_func_object(webpath, work_mode, autostart, autoclose, guard_service,
-                                              login_visualization)
+                                              login_visualization, force_auto_close_window)
             self.alpha_object = {custom_constant.account: account, custom_constant.password: pwd,
                                  custom_constant.webdriver_path: webdriver_path,
                                  custom_constant.webdriver_type: webdriver_type,

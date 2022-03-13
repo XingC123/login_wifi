@@ -180,6 +180,15 @@ class MainWindow:
         self.brower_name_text.grid(row=0, column=1)
         Label(brower_name_frame, text='注: 可在任务管理器运行浏览器并查看').grid(row=1, column=0, columnspan=2)
 
+        # 守护进程状态
+        self.guard_service_thread = None  # 守护进程的线程
+        guard_service_state_frame = Frame(self.main_frame2)
+        guard_service_state_frame.grid(row=currow_frame2(), column=0, columnspan=4)
+        Label(guard_service_state_frame, text='守护进程启用情况').grid(row=0, column=0)
+        self.guard_service_state_label = Label(guard_service_state_frame, text='未启用', bd=1, relief=GROOVE)
+        self.guard_service_state_label.grid(row=0, column=1)
+        Button(guard_service_state_frame, text='停止', command=self.stop_guard_service).grid(row=0, column=2)
+
         # 浏览器驱动
         webdriver_frame = Frame(self.main_frame2, bd=1, relief=GROOVE)
         webdriver_frame.grid(row=currow_frame2(), column=0)
@@ -326,7 +335,15 @@ class MainWindow:
     def refresh_element(self):
         # 根据工作模式初始化其他部件
         self.load_element_by_mode()
-        # 初始化其他控件
+        # 刷新其他控件
+        self.refresh_guard_service_state()
+
+    def refresh_guard_service_state(self):
+        # 刷新守护进程状态
+        if self.guard_service_thread is None:
+            self.guard_service_state_label.config(text='× 未启用')
+        else:
+            self.guard_service_state_label.config(text='√ 已启用')
 
     def load_element_by_mode(self):
         work_mode = self.work_mode_value_int.get()
@@ -411,6 +428,8 @@ class MainWindow:
             except Exception as e:
                 print('login_wifi(self): ', end='')
                 print(e)
+            else:
+                self.stop_guard_service()
 
         def stop_work():
             stop_with_main_thread.stop_thread(tip_thread)
@@ -661,9 +680,24 @@ class MainWindow:
                     # 每隔一段时间检测一次
                     time.sleep(30)
 
-            guard_service_thread = threading.Thread(target=guard_service)
-            guard_service_thread.daemon = True
-            guard_service_thread.start()
+            self.guard_service_thread = threading.Thread(target=guard_service)
+            self.guard_service_thread.daemon = True
+            self.guard_service_thread.start()
+
+    def stop_guard_service(self):
+        # 停止守护进程
+        if self.guard_service_thread is not None:
+            try:
+                stop_with_main_thread.stop_thread(self.guard_service_thread)
+            except Exception as e:
+                print('stop_guard_service(): %s' % e)
+                custom_messagebox.CustomMessagebox(self.root_window, '守护进程', 300, 200, ['停用失败'], True)
+            else:
+                self.guard_service_thread = None
+        else:
+            custom_messagebox.CustomMessagebox(self.root_window, '守护进程', 300, 200, ['未启用守护进程'], True)
+        # 刷新守护进程状态
+        self.refresh_guard_service_state()
 
     # 自定义窗口关闭方法
     def close_root_window(self):

@@ -39,6 +39,10 @@ class CustomMessagebox:
         self.msg_window.title(title)
         self.msg_window.geometry(geometry)
         # self.msg_window.resizable(False, False)
+        if width is None:
+            width = 300
+        if height is None:
+            height = 200
         self.msg_window.minsize(width, height)
         self.msg_window.maxsize(int(width * 1.2), int(height * 1.2))
         # 字体

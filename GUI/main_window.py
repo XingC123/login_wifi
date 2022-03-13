@@ -651,7 +651,8 @@ class MainWindow:
                 while True:
                     if not venusTools.check_internet() and not self.login_work_state:
                         self.login_wifi_main()
-                    time.sleep(5)
+                    # 每隔一段时间检测一次
+                    time.sleep(30)
 
             guard_service_thread = threading.Thread(target=guard_service)
             guard_service_thread.daemon = True

@@ -28,7 +28,7 @@ from func.login.login_webdriver import Login
 
 class MainWindow:
     width_root_window = 1000
-    height_root_window = 600
+    height_root_window = 700
 
     def __init__(self, work_path):
         # 创建配置文件
@@ -253,7 +253,7 @@ class MainWindow:
         self.auto_close_window_value_bool = BooleanVar()
         self.auto_close_window_value_bool.set(False)
 
-        self.auto_close_window_checkbutton = Checkbutton(auto_close_window_frame, text="自动关闭窗口",
+        self.auto_close_window_checkbutton = Checkbutton(auto_close_window_frame, text="自动关闭窗口 (无论是否成功连接)",
                                                          variable=self.auto_close_window_value_bool,
                                                          onvalue=True, offvalue=False,
                                                          command=self.check_auto_close_after_connected)
@@ -262,11 +262,13 @@ class MainWindow:
         self.auto_close_window_after_connected_value_bool = BooleanVar()
         self.auto_close_window_after_connected_value_bool.set(False)
         self.auto_close_window_after_connected_checkbutton = Checkbutton(
-            auto_close_window_frame, text='网络连接后自动关闭',
+            auto_close_window_frame, text='网络连接后自动关闭窗口',
             variable=self.auto_close_window_after_connected_value_bool,
             onvalue=True, offvalue=False,
             command=self.check_auto_close_after_connected)
-        self.auto_close_window_after_connected_checkbutton.grid(row=0, column=1)
+        self.auto_close_window_after_connected_checkbutton.grid(row=1, column=0)
+        Label(auto_close_window_frame,
+              text='注: 激活 [网络连接后自动关闭窗口] 需同时开启 [自动关闭窗口]和[守护进程]').grid(row=2, column=0)
 
         # 守护进程
         guard_service_frame = Frame(self.main_frame2)

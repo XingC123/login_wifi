@@ -50,7 +50,7 @@ class NormalLoginObject:
 
         if mode == 'init' or if_allow_set_object():
             self.func_object.init_func_object(webpath, work_mode, autostart, autoclose, guard_service,
-                                              auto_close_window_after_connected)
+                                              auto_close_window_after_connected=auto_close_window_after_connected)
             self.normal_object = {custom_constant.account: account,
                                   custom_constant.account_x: ax, custom_constant.account_y: ay,
                                   custom_constant.password: pwd, custom_constant.password_x: pwdx,

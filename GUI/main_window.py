@@ -40,7 +40,7 @@ class MainWindow:
         self.alpha_object = None
 
         # 是否正在执行login任务
-        self.login_work_state = False
+        self.login_work_state = None
 
         # 主窗口
         self.root_window = Tk()
@@ -309,7 +309,6 @@ class MainWindow:
         load_config_thread.start()
 
         self.root_window.config(menu=self.menubar)
-        self.root_window.protocol('WM_DELETE_WINDOW', lambda: self.close_root_window())
         self.root_window.mainloop()
 
     # 方法
@@ -435,8 +434,10 @@ class MainWindow:
                     self.guard_service_value_bool.get(),
                     self.login_visualization_value_bool.get(), self.auto_close_window_after_connected_value_bool.get()
                 )
-        except:
-            raise ValueError('generate_object(self): 生成对象失败')
+        except Exception as e:
+            print('generate_object(self): ')
+            print(e)
+            raise ValueError('生成对象失败')
 
     def login_wifi(self, mode='normal'):
         def login():
@@ -447,8 +448,6 @@ class MainWindow:
             except Exception as e:
                 print('login_wifi(self): ', end='')
                 print(e)
-            else:
-                self.stop_guard_service()
 
         def stop_work():
             stop_with_main_thread.stop_thread(tip_thread)
@@ -519,11 +518,13 @@ class MainWindow:
 
             # 自动关闭窗口
             if self.auto_close_window_value_bool.get() and not self.auto_close_window_after_connected_value_bool.get():
-                self.close_root_window()
+                self.root_window.destroy()
 
-            self.login_work_state = False
+            # self.login_work_state = False
         else:
             custom_messagebox.CustomMessagebox(self.root_window, "连接wifi", 300, 200, ['已连接网络, 无需重复认证'], True)
+
+        self.login_work_state = False
 
     def get_xy(self, x_element, y_element):
         get_xy_window.GetXY(self.root_window, x_element, y_element)
@@ -552,7 +553,6 @@ class MainWindow:
         # 工作模式
         work_mode = venusTools.str2int(self.root_config.get_value(custom_constant.userconfig,
                                                                   custom_constant.work_mode))
-        print('load_config_main(self, mode): workmode = [', work_mode, ']')
         if work_mode in self.all_work_mode:
             if work_mode == 1:
                 self.normal_object = NormalLoginObject()
@@ -701,16 +701,20 @@ class MainWindow:
     # 守护进程
     def guard_service(self):
         if self.guard_service_value_bool.get():
-            internet_state = venusTools.check_internet()
-
             # 若启用守护进程
+            # 若已有守护进程正在运行, 则关闭就进程
+            self.stop_guard_service('boot')
+
             def guard_service():
                 while True:
-                    if not internet_state and not self.login_work_state:
-                        self.login_wifi_main()
-                    if internet_state and self.auto_close_window_value_bool.get() and \
-                            self.auto_close_window_after_connected_value_bool.get():
-                        self.close_root_window()
+                    if self.login_work_state is False:
+                        if venusTools.check_internet():
+                            if self.auto_close_window_value_bool.get() and \
+                                    self.auto_close_window_after_connected_value_bool.get():
+                                self.root_window.destroy()
+                        else:
+                            self.login_wifi_main()
+
                     # 每隔一段时间检测一次
                     time.sleep(30)
 
@@ -718,7 +722,7 @@ class MainWindow:
             self.guard_service_thread.daemon = True
             self.guard_service_thread.start()
 
-    def stop_guard_service(self):
+    def stop_guard_service(self, mode='normal'):
         # 停止守护进程
         if self.guard_service_thread is not None:
             try:
@@ -728,18 +732,11 @@ class MainWindow:
                 custom_messagebox.CustomMessagebox(self.root_window, '守护进程', 300, 200, ['停用失败'], True)
             else:
                 self.guard_service_thread = None
+                # 刷新守护进程状态
+                self.refresh_guard_service_state()
         else:
-            custom_messagebox.CustomMessagebox(self.root_window, '守护进程', 300, 200, ['未启用守护进程'], True)
-        # 刷新守护进程状态
-        self.refresh_guard_service_state()
-
-    # 自定义窗口关闭方法
-    def close_root_window(self):
-        curthread_list = threading.enumerate()
-        for i in curthread_list:
-            if str(i).find('stop') == -1:
-                stop_with_main_thread.stop_thread(i)
-        self.root_window.destroy()
+            if mode != 'boot':
+                custom_messagebox.CustomMessagebox(self.root_window, '守护进程', 300, 200, ['未启用守护进程'], True)
 
     @classmethod
     def choose_file(cls, element):
